@@ -249,7 +249,7 @@ patterns СказуемоеВосх { bottomup  } export { node:root_node РОД
 pattern СказуемоеВосх
 {
  Сказуемое0 : export { node:root_node РОД ЛИЦО ЧИСЛО ВРЕМЯ }
-} : ngrams { -2 }
+} //: ngrams { -2 }
 
 
 // Здесь человек либо сходил с ума, либо переставал чему-либо удивляться.
@@ -267,7 +267,7 @@ pattern СказуемоеВосх
     <RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>conj2.<NEXT_COLLOCATION_ITEM>v2
    }
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 // вы едите пюре или суп, потом пьете чай
@@ -279,7 +279,7 @@ pattern СказуемоеВосх
  v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
 }
 : links { v.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>v2 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 // Человек взял да убежал
@@ -291,7 +291,7 @@ pattern СказуемоеВосх
  v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
 }
 : links { v.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 
@@ -308,7 +308,7 @@ pattern СказуемоеВосх
     <NEXT_COLLOCATION_ITEM>conj.
      <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 // я не только прошу , но и умоляю
@@ -326,7 +326,7 @@ pattern СказуемоеВосх
      <NEXT_COLLOCATION_ITEM>conj2.
       <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 // вы едите пюре или суп, потом пьете чай, и наконец пойдете спать
@@ -342,7 +342,7 @@ pattern СказуемоеВосх
     <NEXT_COLLOCATION_ITEM>conj.
      <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 // После второй мировой войны он поступил в университет, но через год бросил учебу и ввязался в дела властителей.
@@ -356,7 +356,7 @@ pattern СказуемоеВосх
  v.<RIGHT_LOGIC_ITEM>conj.
    <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 wordentry_set СочинПротивСоюзСказ=союз:{ и, а, но, что, ибо, поскольку, однако,
@@ -375,7 +375,7 @@ pattern СказуемоеВосх
     <NEXT_COLLOCATION_ITEM>conj.
      <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 2 }
+//: ngrams { 2 }
 
 
 
@@ -392,7 +392,7 @@ pattern СказуемоеВосх
     <NEXT_COLLOCATION_ITEM>conj.
      <NEXT_COLLOCATION_ITEM>v2
 }
-: ngrams { 1 }
+//: ngrams { 1 }
 
 
 

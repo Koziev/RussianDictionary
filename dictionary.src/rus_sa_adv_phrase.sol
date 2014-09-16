@@ -3570,6 +3570,24 @@ pattern ОбстФразаНисх
 : ngrams { 5 }
 
 
+// Без запятой:
+// И вчера и сегодня шёл дождь.
+// ^^^^^^^^^^^^^^^^^
+pattern ОбстФразаНисх
+{
+ conj1=СочинительныйСоюз1
+ adv=ОбстФразаНисх : export { node:root_node KEYFEATURE_REQUIRED:0 }
+ conj2=СочинительныйСоюз2
+ pn=Обст0
+} : links
+{
+ adv.{
+      <PREFIX_CONJUNCTION>conj1
+      <RIGHT_LOGIC_ITEM>conj2.
+       <NEXT_COLLOCATION_ITEM>pn
+     }
+}
+: ngrams { 3 }
 
 
 // Она может отдохнуть как дома, так и на лужайке

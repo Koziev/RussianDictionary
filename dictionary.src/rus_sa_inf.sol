@@ -1161,23 +1161,6 @@ pattern Инф2Восх
  v1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2
 }
 
-// девушки хотят или петь песни, или немного потанцевать
-pattern Инф2Восх
-{
- conj1=СочинительныйСоюз1
- v1=Инф2Восх:export { node:root_node }
- comma=_запятая
- conj2=СочинительныйСоюз2
- v2=Инф2_Хвост
-} : links
-{
- v1.{
-     <PREFIX_CONJUNCTION>conj1
-     <RIGHT_LOGIC_ITEM>comma.
-      <NEXT_COLLOCATION_ITEM>conj2.
-       <NEXT_COLLOCATION_ITEM>v2
-    }
-}
 
 
 // Пропущена запятая:
@@ -1198,6 +1181,9 @@ pattern Инф2Восх
     }
 }
 : ngrams { -1 }
+
+
+
 
 // они хотят петь, плясать и т.д.
 //           ^^^^^^^^^^^^^^^^^^^^
@@ -1379,6 +1365,46 @@ pattern Инф export { ПЕРЕХОДНОСТЬ (ПАДЕЖ) (ВИД) node:root
 pattern Инф2
 {
  Инф2Восх:export { node:root_node }
+}
+
+
+
+// Ни есть, ни пить.
+pattern Инф2
+{
+ conj1=ЛогичСоюз2
+ v1=Инф2:export { node:root_node }
+ comma=','
+ conj2=ЛогичСоюз2
+ v2=Инф2
+} : links
+{
+ v1.{
+     <PREFIX_CONJUNCTION>conj1
+     <RIGHT_LOGIC_ITEM>comma.
+      <NEXT_COLLOCATION_ITEM>conj2.
+       <NEXT_COLLOCATION_ITEM>v2
+    }
+}
+
+
+// девушки хотят или петь песни, или немного потанцевать
+//               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pattern Инф2
+{
+ conj1=СочинительныйСоюз1
+ v1=Инф2:export { node:root_node }
+ comma=_запятая
+ conj2=СочинительныйСоюз2
+ v2=Инф2
+} : links
+{
+ v1.{
+     <PREFIX_CONJUNCTION>conj1
+     <RIGHT_LOGIC_ITEM>comma.
+      <NEXT_COLLOCATION_ITEM>conj2.
+       <NEXT_COLLOCATION_ITEM>v2
+    }
 }
 
 
@@ -1693,15 +1719,24 @@ pattern Инф2БезДопВосх
  v1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2
 }
 
+// ------------------------------------------
+
+pattern Инф2БезДоп
+{
+ Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
+}
+
+
+
 // девушки будут или петь песни, или танцевать
 //               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pattern Инф2БезДопВосх
+pattern Инф2БезДоп
 {
  conj1=СочинительныйСоюз1
- v1=Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
+ v1=Инф2БезДоп:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
  comma=_запятая
  conj2=СочинительныйСоюз2
- v2=Инф2БезДоп_Хвост
+ v2=Инф2БезДоп
 } : links
 {
  v1.{
@@ -1716,12 +1751,12 @@ pattern Инф2БезДопВосх
 // Пропущена запятая:
 // мы будем и грести и смотреть...
 //          ^^^^^^^^^^^^^^^^^^^
-pattern Инф2БезДопВосх
+pattern Инф2БезДоп
 {
  conj1=ЛогичСоюз2
- v1=Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
+ v1=Инф2БезДоп:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
  conj2=ЛогичСоюз2
- v2=Инф2БезДоп_Хвост
+ v2=Инф2БезДоп
 } : links
 {
  v1.{
@@ -1733,22 +1768,15 @@ pattern Инф2БезДопВосх
 : ngrams { -1 }
 
 
-
-pattern Инф2БезДоп
-{
- Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
-}
-
-
 // мы будем если не писать, так читать
 //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
 pattern Инф2БезДоп
 {
  conj1=ЕслиСоедГолова
- v1=Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
+ v1=Инф2БезДоп:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
  comma=','
  conj2=ЕслиСоедХвост
- v2=Инф2БезДоп_Хвост
+ v2=Инф2БезДоп
 } : links
 { v1.{
       <PREFIX_CONJUNCTION>conj1
@@ -1763,9 +1791,9 @@ pattern Инф2БезДоп
 pattern Инф2БезДоп
 {
  conj1=ЕслиСоедГолова
- v1=Инф2БезДопВосх:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
+ v1=Инф2БезДоп:export{ ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД node:root_node }
  comma=','
- v2=Инф2БезДоп_Хвост
+ v2=Инф2БезДоп
 } : links
 { v1.{
       <PREFIX_CONJUNCTION>conj1

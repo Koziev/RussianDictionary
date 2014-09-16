@@ -5875,7 +5875,7 @@ tree_scorer ВалентностьСложнСказ language=Russian generic
                      <NEXT_CLAUSE>','.союз:что{}
                     }
             }
-  then -10
+  then -5
 }
 
 
