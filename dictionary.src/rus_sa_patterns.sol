@@ -518,6 +518,7 @@ wordentry_set СоюзКакВводн0={
  союз:или{},
  союз:а{},
  союз:да{},
+ союз:да и{}, // Да и других плюсов хватает.
  союз:если{},
  союз:прежде чем{},
  союз:поскольку{}, // поскольку умирать еще рано
@@ -629,6 +630,16 @@ pattern СоюзКакВводн
 } : ngrams { -5 }
 
 
+// Ну а если взять предельный радиус действий самолетов?
+// ^^^^^^^^^
+pattern СоюзКакВводн
+{
+ p1=частица:ну{} : export { node:root_node }
+ p2=союз:*{}
+ p3=СоюзКакВводн
+} : ngrams { -1 }
+: links { p1.<NEXT_COLLOCATION_ITEM>p2.<NEXT_COLLOCATION_ITEM>p3 }
+
 
 // ***********************
 // ПРЕДЛОЖЕНИЕ
@@ -671,6 +682,15 @@ pattern СодержаниеРечи
 pattern СодержаниеРечи
 {
  s=НеполнПредлож : export { node:root_node }
+ end=@optional(КонецПрямойРечи)
+} : links { s.~<PUNCTUATION>end }
+
+
+// - Да, - сказал старик.
+//   ^^
+pattern СодержаниеРечи
+{
+ s=ЧАСТИЦА:ДА{} : export { node:root_node }
  end=@optional(КонецПрямойРечи)
 } : links { s.~<PUNCTUATION>end }
 
@@ -826,16 +846,6 @@ pattern Предлож1_Состав
  ГлПредикат : export { node:root_node }
 }
 
-/*
-// Да  и редьку не забудь.
-//       ^^^^^^^^^^^^^^^^
-patterns ПредикатИмператив export { node:root_node }
-pattern Предлож1_Состав
-{
- ПредикатИмператив : export { node:root_node }
-}
-*/
-
 pattern Предлож1
 {
  Предлож1_Состав : export { node:root_node }
@@ -850,6 +860,28 @@ pattern Предлож1
  intro=ВводнаяФраза
  p=Предлож1_Состав : export { node:root_node }
 } : links { p.<BEG_INTRO>intro }
+
+
+// Да, но с чего же я начал?
+// ^^^^^^
+// Контрпример:
+// Нет, так нельзя.
+// ^^^^
+pattern Предлож1
+{
+ intro=ВводнаяФраза
+ @probe_left(',')
+ conj=СоюзКакВводн0
+ p=Предлож1_Состав : export { node:root_node }
+} : links
+{
+ p.{
+    <BEG_INTRO>intro
+    <PREFIX_CONJUNCTION>conj
+   }
+}
+
+
 
 
 // Предложения, начинающиеся с сочинительного союза:
@@ -1013,6 +1045,18 @@ pattern ВводнСоюз
 {
  ВводнСоюзЭлем : export { node:root_node }
 }
+
+// И если были подзорные трубы.
+// ^^^^^^
+pattern ВводнСоюз
+{
+ w1=союз:*{} : export { node:root_node }
+ w2=ВводнСоюзЭлем
+}
+: links { w1.<NEXT_COLLOCATION_ITEM>w2 }
+: ngrams { -2 }
+
+
 
 wordentry_set ВводнСоюзЭлем2 = { союз:и{}, ВводнСоюзЭлем }
 

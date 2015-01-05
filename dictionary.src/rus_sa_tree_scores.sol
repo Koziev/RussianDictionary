@@ -1,4 +1,4 @@
-﻿// LC->22.08.2013
+﻿// LC->07.11.2014
 
 tree_scorers ОдушОбъект
 
@@ -106,6 +106,113 @@ tree_scorer НеодушОбъект language=Russian
  if context { местоим_сущ:что-либо{} }
   then 1
 }
+
+// ------------------------------------
+
+/*
+function int CheckVerbSubjectConcord( tree v, tree sbj )
+{
+ int res_score=0;
+
+ // Для безличных глаголов проверять не надо.
+ if( eq( wordform_class(v),ГЛАГОЛ) )
+  then
+  {
+   int sbj_number = wordform_get_coord( sbj, ЧИСЛО );
+   if( eq(sbj_number,-1) )
+    then
+    {
+     // Подлежащим может оказаться часть речи без категории числа.
+     // У нас есть кое-что общее.
+     //            ^^^^^^^
+     if( eq( wordform_class( sbj ), МЕСТОИМ_СУЩ ) )
+      then sbj_number = ЧИСЛО:ЕД;
+     else if( eq( wordform_class( sbj ), ИНФИНИТИВ ) )
+      then sbj_number = ЧИСЛО:ЕД;
+    }
+ 
+   int v_number = wordform_get_coord( v, ЧИСЛО );
+ 
+   // согласование по числу выполняется в любом времени
+   if( neq( sbj_number, v_number ) )
+    then res_score=-10; // рассогласование по числу
+    else
+    {
+     int v_tense = wordform_get_coord( v, ВРЕМЯ );
+     if( eq( v_tense, ВРЕМЯ:ПРОШЕДШЕЕ ) )
+      then
+      {
+       if( eq( v_number, ЧИСЛО:ЕД ) )
+        then
+        {
+         // В прошедшем времени надо сопоставить род.
+         // Если подлежащее - местоимение Я в первом или втором лице, то род 
+         // проверять не надо:
+         // А я и не слышала.
+         //  ^^^     ^^^^^^^
+         if( log_and(
+                     eq( wordform_class(sbj), МЕСТОИМЕНИЕ ),
+                     one_of( wordform_get_coord(sbj,ЛИЦО), ЛИЦО:1, ЛИЦО:2 )
+                    ) )
+          then
+          {
+           // nothing to check
+          }
+         else
+          { 
+           int sbj_gender = wordform_get_coord( sbj, РОД );
+           int v_gender = wordform_get_coord( v, РОД );
+           if( neq( sbj_gender, v_gender ) )
+            then res_score=-10; // рассогласование по роду
+          }
+        }
+      }
+      else
+      {
+       // в настоящем и будущем времени надо сопоставить число и лицо
+       // особый случай - глагол ЕСТЬ (форма глагола БЫТЬ настоящего времени),
+       // она не имеет признака лица.
+ 
+       int sbj_person = wordform_get_coord( sbj, ЛИЦО );
+       if( eq( sbj_person, -1 ) )
+        then sbj_person=ЛИЦО:3;
+ 
+       if( log_not( eqi( wordform_lexem(v), 'есть' ) ) ) 
+        then
+        {
+         int v_person = wordform_get_coord( v, ЛИЦО );
+         if( neq( sbj_person, v_person ) )
+          then res_score=-10; // рассогласование по лицу
+        }
+      }
+    }
+  }
+
+ return res_score;
+}
+
+
+// Обычный предикат с глаголом в личной форме:
+// Я буду читать сказку
+// ^^^^^^^^^^^^^
+//
+// Безличная конструкция:
+// от этого мне было жаль отказываться
+//          ^^^      ^^^^ ^^^^^^^^^^^^
+tree_scorer ВалентностьПредиката language=Russian generic
+{
+ if context { инфинитив:*{}.{ v=<LEFT_AUX_VERB>глагол:*{} sbj=<SUBJECT>*:*{} } }
+  then CheckVerbSubjectConcord(v,sbj)
+}
+
+// Суд вынес решение
+// ^^^^^^^^^
+tree_scorer ВалентностьПредиката language=Russian generic
+{
+ if context { v=глагол:*{}.sbj=<SUBJECT>*:*{} }
+  then CheckVerbSubjectConcord(v,sbj)
+}
+*/
 
 // ------------------------------------
 
@@ -499,13 +606,15 @@ tree_scorer language=Russian
   then 2
 }
 
-
+/*
 // Студентка села за стол и начала читать журнал.
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { rus_verbs:начать{}.инфинитив:*{ вид:несоверш } }
   then 2
 }
+*/
+
 
 // Село должно отпраздновать окончание страды
 //      ^^^^^^^^^^^^^^^^^^^^
@@ -2808,12 +2917,13 @@ tree_scorer ВалентностьГлагола language=Russian
   then -1
 }
 
+/*
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { rus_verbs:пройти{}.<OBJECT>НеодушОбъект{ падеж:вин } }
   then 1
 }
-
+*/
 
 // злость прошла довольно давно.
 // ^^^^^^^^^^^^^
@@ -7199,14 +7309,6 @@ tree_scorer ВалентностьГлагола language=Russian
 
 // ++++++++++++++++++++++
 
-tree_scorer ВалентностьГлагола language=Russian generic
-{
- if context { прилагательное:*{}.[not]*:*{} }
-  then -10
-}
-
-// ++++++++++++++++++++++
-
 // чувашскими законотворцами был взят проект Федерального закона
 tree_scorer ВалентностьГлагола language=Russian generic
 {
@@ -7338,6 +7440,7 @@ tree_scorer ВалентностьГлагола language=Russian
 
 // ----------------------------------
 
+/*
 wordentry_set ПредлогНаправления = предлог:{ на, в, под, через }
 
 // дракону на спину сел
@@ -7361,7 +7464,7 @@ tree_scorer ВалентностьГлагола language=Russian generic
             }
   then 8
 }
-
+*/
 
 // -----------------------------------
 
@@ -7383,6 +7486,14 @@ tree_scorer ВалентностьГлагола language=Russian
 tree_scorer ВалентностьГлагола language=Russian 
 {
  if context { rus_verbs:пойти{}.послелог:навстречу{}.*:*{ падеж:дат } }
+  then 5
+}
+
+// Он сделал шаг ей навстречу.
+//    ^^^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian 
+{
+ if context { rus_verbs:сделать{}.{ <OBJECT>НеодушОбъект{ ПАДЕЖ:ВИН } послелог:навстречу{}.*:*{ падеж:дат } } }
   then 5
 }
 
@@ -7668,6 +7779,21 @@ tree_scorer ВалентностьГлагола language=Russian
   then 4
 }
 
+
+// Радости не было предела
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:быть{ наклонение:изъяв число:ед род:ср время:прошедшее }.
+               {
+                частица:не{}
+                <OBJECT>НеодушОбъект{ ПАДЕЖ:ДАТ }
+                <OBJECT>'предела'{ ПАДЕЖ:РОД }
+               }
+            }
+  then 6
+}
+
+
 // ---------------------------------------------
 
 wordentry_set ОтрицМестоим = местоим_сущ:{ никто, ничто }
@@ -7705,12 +7831,6 @@ tree_scorer ВалентностьГлагола language=Russian
 
 // наконец усталость дала о себе знать.
 //                   ^^^^        ^^^^^
-tree_scorer ВалентностьГлагола language=Russian
-{
- if context { rus_verbs:дать{}.инфинитив:знать{} }
-  then 2
-}
-
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { инфинитив:знать{}.rus_verbs:дать{} }
@@ -7832,3 +7952,159 @@ tree_scorer ВалентностьГлагола language=Russian
 }
 
 
+// Ты совсем отстал от жизни.
+//           ^^^^^^ ^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:отстать{}.предлог:от{} }
+  then 2
+}
+
+// Тут есть над чем задуматься
+//          ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:задуматься{}.предлог:над{} }
+  then 2
+}
+
+
+// Пора было положить этому конец.
+//           ^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:положить{}.{ <OBJECT>существительное:конец{ ПАДЕЖ:ВИН } <OBJECT>*:*{ ПАДЕЖ:ДАТ }  } }
+  then 2
+}
+
+// Задержать преступников по горячим следам милиционерам не удалось.
+// ^^^^^^^^^              ^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:задержать{}."по"."горячим"."следам" }
+  then 4
+}
+
+// ----------------------------
+
+// Особо обрабатываем ситуацию с появлением РОДИТЕЛЬНОЙ валентности в случае,
+// когда модальный глагол стоит в отрицательной форме:
+//
+// Ломать вы ничего не хотите.
+// ^^^^^^    ^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian generic
+{
+ if context { инфинитив:*{ ПЕРЕХОДНОСТЬ:ПЕРЕХОДНЫЙ ПАДЕЖ:ВИН }
+              .{
+                <LEFT_AUX_VERB>глагол:*{}.<NEGATION_PARTICLE>частица:не{}
+                <OBJECT>*:*{ ПАДЕЖ:РОД }
+               }
+            }
+  then 3
+}
+
+// ----------------------------------------
+
+// Они не хотят ее знать.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { инфинитив:знать{}.{ <LEFT_AUX_VERB>глагол:хотеть{} } }
+  then 5
+}
+
+
+// Никому до тебя нет дела
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { частица:нет{}.{ <OBJECT>'дела'{ падеж:род } <PREPOS_ADJUNCT>предлог:до{} } }
+  then 5
+}
+
+// Я не удостоил Ее ответом.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:удостоить{}.{ <OBJECT>*:*{ ПАДЕЖ:ДАТ } <OBJECT>'ответом' } }
+  then 2
+}
+
+// -----------------------------------------------
+
+
+// Горю родителей нет предела.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { частица:нет{}.{ <OBJECT>'предела'{ падеж:род } *:*{ ПАДЕЖ:ДАТ } } }
+  then 5
+}
+
+// -----------------------------------------
+// Он весь день провел со мной!
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:провести{}.{ <OBJECT>'день'.'весь' <PREPOS_ADJUNCT>предлог:с{}.*:*{ падеж:твор } } }
+  then 4
+}
+
+
+
+// Рабочие день и ночь трудятся.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:трудиться{}.<ATTRIBUTE>'день'.'и'.'ночь' }
+  then 2
+}
+
+
+wordentry_set СчетныеНаречия=наречие:{ мало, немало, много, немного, маловато, многовато }
+
+// Но и этого будет мало.
+//      ^^^^^^^^^^^^^^^^
+// Контрпример:
+// Несколько мгновений все было тихо.
+// ~~~~~~~~~               ^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:быть{}.{ <OBJECT>*:*{ падеж:род } <ATTRIBUTE>СчетныеНаречия } }
+  then 5
+}
+
+
+// Шуму было много, однако гора родила мышь.
+// ^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:быть{}.{ <OBJECT>*:*{ падеж:парт } <ATTRIBUTE>СчетныеНаречия } }
+  then 5
+}
+
+
+// Я не удостоил Ее ответом.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:удостоить{}.{ <OBJECT>*:*{ падеж:вин } <OBJECT>'ответом' } }
+  then 2
+}
+
+word_set ЕеЕгоИхОбъект = { 'ее', 'его', 'их' }
+
+// Аня неумело стиснула ее зубами.
+//             ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian generic
+{
+ if context { глагол:*{ ПЕРЕХОДНОСТЬ:ПЕРЕХОДНЫЙ ПАДЕЖ:ВИН ~ПАДЕЖ:ТВОР }.
+              {
+               <OBJECT>ЕеЕгоИхОбъект{ падеж:вин }
+               <OBJECT>*:*{ падеж:твор }
+              }
+            }
+  then 2
+}
+
+
+// Орлиц в поле зрения не оказалось.
+//       ^^^^^^^^^^^^^    ^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian generic
+{
+ if context { rus_verbs:оказаться{}.<PREPOS_ADJUNCT>предлог:в{}.'поле'{ РОД:СР ПАДЕЖ:ПРЕДЛ }.'зрения' }
+  then 2
+}

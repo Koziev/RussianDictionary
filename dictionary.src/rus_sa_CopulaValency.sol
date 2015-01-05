@@ -9,9 +9,10 @@ tree_scorer ВалентностьНульСвязки language=Russian generic
 }
 
 
-
 // - А в чем дело? - обиделся исполнитель.
 //     ^^^^^^^^^^
+// В этом-то и дело.
+// ^^^^^^^^^^^^^^^^
 tree_scorer ВалентностьНульСвязки language=Russian
 {
  if context { существительное:дело{ ПАДЕЖ:ИМ }.<PREPOS_ADJUNCT>предлог:в{}.*:*{ падеж:предл } }
@@ -25,6 +26,69 @@ tree_scorer ВалентностьНульСвязки language=Russian
 tree_scorer ВалентностьНульСвязки language=Russian generic
 {
  if context { существительное:*{ ПАДЕЖ:ИМ }.деепричастие:*{} }
+  then -10
+}
+
+
+// Пою я, что ли?
+//        ~~~~~~
+tree_scorer ВалентностьНульСвязки language=Russian
+{
+ if context { местоим_сущ:что{ ПАДЕЖ:ИМ }.частица:ли{} }
+  then -10
+}
+
+
+
+
+// -------------------------------------------------
+
+tree_scorers ОбстНульСвязки
+
+tree_scorer ОбстНульСвязки language=Russian
+{
+ if context { наречие:*{} }
+  then 1
+}
+
+tree_scorer ОбстНульСвязки language=Russian
+{
+ if context { предлог:*{} }
+  then 1
+}
+
+tree_scorer ОбстНульСвязки language=Russian
+{
+ if context { деепричастие:*{} }
+  then 1
+}
+
+
+// Клянусь вам, это правда.
+//              ^^^
+tree_scorer ОбстНульСвязки language=Russian
+{
+ if context { местоим_сущ:*{} }
+  then 1
+}
+
+
+// - Здравствуйте, я Евгения.
+//                ^^^
+tree_scorer ОбстНульСвязки language=Russian
+{
+ if context { местоимение:*{} }
+  then 1
+}
+
+
+// Подавим одиночное существительное в роли именной связки:
+//
+// - Ты обедал, Роналд?
+//              ~~~~~~
+tree_scorer ВалентностьНульСвязки language=Russian generic
+{
+ if context { существительное:*{ ПАДЕЖ:ИМ }.[not]ОбстНульСвязки }
   then -10
 }
 
@@ -71,3 +135,4 @@ tree_scorer ВалентностьНульСвязки language=Russian generic
 */
 
 // -----------------------------------------------------------
+

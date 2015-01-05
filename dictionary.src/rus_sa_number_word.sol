@@ -1,6 +1,6 @@
 ﻿// ПАТТЕРНЫ С ЧИСЛИТЕЛЬНЫМИ, КОТОРЫЕ ЗАПИСАНЫ СЛОВАМИ
 
-patterns ГруппаЧисл0 export { node:root_node ПАДЕЖ ЧИСЛО }
+patterns ГруппаЧисл0 export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 
 // --------------------------------------------------------
 
@@ -57,13 +57,13 @@ wordentry_set Сотни = {
 
 // --------------------
 
-patterns Числ1 export { ПАДЕЖ node:root_node }
+patterns Числ1 export { ПАДЕЖ РОД node:root_node }
 
 // одно пальто висело на вешалке
 // ^^^^
 pattern Числ1
 {
- ЧИСЛИТЕЛЬНОЕ:ОДИН{} : export { ПАДЕЖ node:root_node }
+ ЧИСЛИТЕЛЬНОЕ:ОДИН{} : export { ПАДЕЖ РОД node:root_node }
 }
 
 wordentry_set ПравыйМодифОдин={ наречие:еще{}, наречие:лишь{},
@@ -76,7 +76,7 @@ wordentry_set ПравыйМодифОдин={ наречие:еще{}, наре
 //           ^^^^^^^^^^^
 pattern Числ1
 {
- n=ЧИСЛИТЕЛЬНОЕ:ОДИН{} : export { ПАДЕЖ node:root_node }
+ n=ЧИСЛИТЕЛЬНОЕ:ОДИН{} : export { ПАДЕЖ РОД node:root_node }
  mod=ПравыйМодифОдин
 } : links { n.<ATTRIBUTE>mod }
 
@@ -87,7 +87,7 @@ pattern Числ1
 pattern Числ1
 {
  N10=Десятки : export { ПАДЕЖ node:root_node }
- N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N10:ПАДЕЖ }
+ N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N10:ПАДЕЖ }:export { РОД }
 }
 : links { n10.<CONUMBER>n }
 : ngrams { 1 }
@@ -98,7 +98,7 @@ pattern Числ1
 pattern Числ1
 {
  N100=Сотни : export { ПАДЕЖ node:root_node }
- N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N100:ПАДЕЖ }
+ N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N100:ПАДЕЖ }:export { РОД }
 } : links { n100.<CONUMBER>n }
 : ngrams { 1 }
 
@@ -109,7 +109,7 @@ pattern Числ1
 {
  N100=Сотни : export { ПАДЕЖ node:root_node }
  N10=Десятки{=N100:ПАДЕЖ}
- N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N10:ПАДЕЖ }
+ N=ЧИСЛИТЕЛЬНОЕ:ОДИН{ =N10:ПАДЕЖ }:export { РОД }
 }
 : links { n100.<CONUMBER>n10.<CONUMBER>n }
 : ngrams { 2 }
@@ -119,7 +119,7 @@ pattern Числ1
 //   ^^^^^^
 pattern Числ1
 {
- числительное:???{} : export { node:root_node ПАДЕЖ }
+ числительное:???{} : export { node:root_node ПАДЕЖ РОД }
 } : ngrams { -2 }
 
 
@@ -129,25 +129,25 @@ pattern Числ1
 //                  ^^^^
 pattern ГруппаЧисл0
 {
- Числ1 : export { node:root_node ПАДЕЖ ЧИСЛО:ЕД }
+ Числ1 : export { node:root_node ПАДЕЖ ЧИСЛО:ЕД РОД }
 }
 
 // ---------------------------------------------------------
 
-patterns Числ9 export { ПАДЕЖ node:root_node }
+patterns Числ9 export { ПАДЕЖ РОД node:root_node }
 
 // Я видел шесть очень ярких вспышек
 //         ^^^^^
 pattern Числ9
 {
- ЕдиницыБольше1 : export { node:root_node ПАДЕЖ }
+ ЕдиницыБольше1 : export { node:root_node ПАДЕЖ РОД }
 }
 
 // Еще десять населенных пунктов получили газ.
 //     ^^^^^^
 pattern Числ9
 {
- ЕдиницыБольше9 : export { node:root_node ПАДЕЖ }
+ ЕдиницыБольше9 : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -155,7 +155,7 @@ pattern Числ9
 //              ^^^^^^^^
 pattern Числ9
 {
- Десятки : export { node:root_node ПАДЕЖ }
+ Десятки : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -163,7 +163,7 @@ pattern Числ9
 //                 ^^^^^^^
 pattern Числ9
 {
- Сотни : export { node:root_node ПАДЕЖ }
+ Сотни : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -172,7 +172,7 @@ pattern Числ9
 pattern Числ9
 {
  n10=Десятки : export { node:root_node ПАДЕЖ }
- n1=ЕдиницыБольше1{ =n10:ПАДЕЖ }
+ n1=ЕдиницыБольше1{ =n10:ПАДЕЖ } : export { РОД }
 } : links { n10.<CONUMBER>n1 }
   : ngrams { 1 }
 
@@ -184,7 +184,7 @@ pattern Числ9
 pattern Числ9
 {
  n100=Сотни : export { node:root_node ПАДЕЖ }
- n10=Десятки{ =n100:ПАДЕЖ }
+ n10=Десятки{ =n100:ПАДЕЖ } : export { РОД }
 } : links { n100.<CONUMBER>n10 }
   : ngrams { 1 }
 
@@ -194,7 +194,7 @@ pattern Числ9
 pattern Числ9
 {
  n100=Сотни : export { node:root_node ПАДЕЖ }
- n1=ЕдиницыБольше9{ =n100:ПАДЕЖ }
+ n1=ЕдиницыБольше9{ =n100:ПАДЕЖ } : export { РОД }
 } : links { n100.<CONUMBER>n1 }
   : ngrams { 1 }
 
@@ -205,7 +205,7 @@ pattern Числ9
 {
  n100=Сотни : export { node:root_node ПАДЕЖ }
  n10=Десятки{ =n100:ПАДЕЖ }
- n1=ЕдиницыБольше1{ =n10:ПАДЕЖ }
+ n1=ЕдиницыБольше1{ =n10:ПАДЕЖ } : export { РОД }
 } : links { n100.<CONUMBER>n10.<CONUMBER>n1 }
   : ngrams { 1 }
 
@@ -215,7 +215,7 @@ pattern Числ9
 pattern Числ9
 {
  n100=Сотни : export { node:root_node ПАДЕЖ }
- n1=ЕдиницыБольше1{ =n100:ПАДЕЖ }
+ n1=ЕдиницыБольше1{ =n100:ПАДЕЖ } : export { РОД }
 } : links { n100.<CONUMBER>n1 }
   : ngrams { 1 }
 
@@ -226,7 +226,7 @@ pattern Числ9
 //     ^^^^
 pattern Числ9
 {
- числительное:*{ КАТЕГОРИЯ_ЧИСЛ:СОБИР } : export { node:root_node ПАДЕЖ }
+ числительное:*{ КАТЕГОРИЯ_ЧИСЛ:СОБИР } : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -234,7 +234,7 @@ pattern Числ9
 //   ^^^^^^
 pattern Числ9
 {
- числительное:???{} : export { node:root_node ПАДЕЖ }
+ числительное:???{} : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -242,7 +242,7 @@ pattern Числ9
 
 pattern ГруппаЧисл0
 {
- Числ9 : export { node:root_node ПАДЕЖ ЧИСЛО:МН }
+ Числ9 : export { node:root_node ПАДЕЖ ЧИСЛО:МН РОД }
 }
 
 // Еще пять студентов вошло.
@@ -250,7 +250,7 @@ pattern ГруппаЧисл0
 pattern ГруппаЧисл0
 {
  mod=МодификаторЧисла
- n=Числ9 : export { node:root_node ПАДЕЖ ЧИСЛО:МН }
+ n=Числ9 : export { node:root_node ПАДЕЖ ЧИСЛО:МН РОД }
 }
 : links { n.<ATTRIBUTE>mod }
 : ngrams { 1 }
@@ -287,7 +287,7 @@ pattern МасштабныйПрефиксЧисла
 pattern ГруппаЧисл0
 {
  p=МасштабныйПрефиксЧисла
- n=ГруппаЧисл0 : export { ПАДЕЖ ЧИСЛО node:root_node }
+ n=ГруппаЧисл0 : export { ПАДЕЖ ЧИСЛО РОД node:root_node }
 } : links { n.<CONOUN>p }
 
 
@@ -299,7 +299,7 @@ pattern ГруппаЧисл0
 // нужно только для союзных паттернов типа "три или 4"
 pattern ГруппаЧисл0
 {
- num_word:*{} : export { node:root_node ПАДЕЖ ЧИСЛО }
+ num_word:*{} : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 } : ngrams { -2 }
 
 
@@ -318,7 +318,7 @@ pattern ГруппаЧисл0
 pattern ГруппаЧисл0
 {
  mod=МодификаторЧисла
- n=ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО }
+ n=ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 } : links { n.<ATTRIBUTE>mod }
 
 // Ученые публикуют огромный каталог более чем 300000 близлежащих галактик
@@ -327,35 +327,39 @@ pattern ГруппаЧисл0
 {
  mod=наречие:более{}
  mod2=союз:чем{}
- n=ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО }
+ n=ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 } : links { n.<ATTRIBUTE>mod.<ATTRIBUTE>mod2 }
 
 
 // ----------------------------------------
 
-patterns ГруппаЧислВосх { bottomup  } export { node:root_node ПАДЕЖ ЧИСЛО }
+patterns ГруппаЧислВосх { bottomup  } export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 
 pattern ГруппаЧислВосх
 {
- ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО }
+ ГруппаЧисл0 : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 }
 
 // купи пять, шесть или семь яблок
 //      ^^^^^^^^^^^^^^^^^^^^
 pattern ГруппаЧислВосх
 {
- n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ }
+ n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ РОД }
  comma=','
- n2=ГруппаЧисл0 : export { ЧИСЛО }
+ n2=ГруппаЧисл0{ [-1]=n1:ПАДЕЖ [-1]=n1:РОД } : export { ЧИСЛО }
 } : links { n1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
 
 // купи пять-шесть яблок
 //      ^^^^^^^^^^
+// Минут десять-пятнадцать можно еще отдохнуть.
+// ^^^^^^^^^^^^^^^^^^^^^^^
+// Они шли террасами в три-четыре яруса.
+//                     ^^^^^^^^^^^^^^^^
 pattern ГруппаЧислВосх
 {
- n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ }
+ n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ РОД }
  t='-'
- n2=ГруппаЧисл0 : export { ЧИСЛО }
+ n2=ГруппаЧисл0{ [-1]=n1:ПАДЕЖ [-1]=n1:РОД } : export { ЧИСЛО }
 } : links { n1.<RIGHT_LOGIC_ITEM>t.<NEXT_COLLOCATION_ITEM>n2 }
 
 
@@ -365,9 +369,9 @@ pattern ГруппаЧислВосх
 //          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pattern ГруппаЧислВосх
 {
- n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ }
+ n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ РОД }
  conj=ЛогичСоюз
- n2=ГруппаЧисл0 : export { ЧИСЛО }
+ n2=ГруппаЧисл0{ [-1]=n1:ПАДЕЖ [-1]=n1:РОД } : export { ЧИСЛО }
 } : links { n1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
 
 
@@ -375,10 +379,10 @@ pattern ГруппаЧислВосх
 //                 ^^^^^^^^^^^^^^^^^^^^^^
 pattern ГруппаЧислВосх
 {
- n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ }
+ n1=ГруппаЧислВосх : export { node:root_node ПАДЕЖ РОД }
  comma=','
  conj=ЛогичСоюз
- n2=ГруппаЧисл0 : export { ЧИСЛО }
+ n2=ГруппаЧисл0{ [-1]=n1:ПАДЕЖ } : export { ЧИСЛО }
 } : links
 {
  n1.<RIGHT_LOGIC_ITEM>comma.
@@ -392,10 +396,12 @@ pattern ГруппаЧислВосх
 
 pattern ГруппаЧисл
 {
- ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО }
+ ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 }
 
 
+// Расстояние составит более двух километров.
+//                     ^^^^^^^^^^
 // В результате пострадало более 80 человек.
 //                         ^^^^^^^^
 // К 2010 году в Курганской области останется не более десяти рынков.
@@ -403,8 +409,10 @@ pattern ГруппаЧисл
 pattern ГруппаЧисл
 {
  mod=ГруппаСрНареч1{ БолееМенее }
- q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО }
-} : links { q.<ATTRIBUTE>mod }
+ q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
+}
+: links { q.<ATTRIBUTE>mod }
+: ngrams { 2 }
 
 
 // Мост теперь охраняли не два, а четыре солдата.
@@ -412,7 +420,7 @@ pattern ГруппаЧисл
 pattern ГруппаЧисл
 {
  ne=частица:не{}
- q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ }
+ q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ РОД }
  comma=',' 
  conj=союз:а{}
  q2=ГруппаЧислВосх{ =q:ПАДЕЖ } : export { ЧИСЛО }
@@ -432,7 +440,7 @@ pattern ГруппаЧисл
 pattern ГруппаЧисл
 {
  ni=частица:ни{}
- q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО }
+ q=ГруппаЧислВосх : export { node:root_node ПАДЕЖ ЧИСЛО РОД }
 } : links { q.<NEGATION_PARTICLE>ni }
 
 
@@ -452,7 +460,7 @@ pattern ГруппаЧисл
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ИМ ЧИСЛО:МН } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -497,10 +505,12 @@ pattern ЧислСущ
 //            ^^^^^^^^^^^^^^^^^^^^^
 // Взять три кекса.
 //       ^^^^^^^^^
+// Два года назад он ушел
+// ^^^^^^^^
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -510,7 +520,7 @@ pattern ЧислСущ
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:ЕД } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:ВИН ЧИСЛО:ЕД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ВИН ЧИСЛО:ЕД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -522,7 +532,7 @@ pattern ЧислСущ
 pattern ЧислСущ
 {
  obj=существительное:*{ ПАДЕЖ:РОД }:export { РОД node:root_node }
- c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН } : export { ПАДЕЖ ЧИСЛО ОДУШ }
+ c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН [-1]=obj:РОД } : export { ПАДЕЖ ЧИСЛО ОДУШ }
 }
 : links { obj.<ATTRIBUTE>c }
 : ngrams { -2 }
@@ -534,10 +544,12 @@ pattern ЧислСущ
 
 // Откажись от ста тридцати рублей!
 //             ^^^^^^^^^^^^^^^^^^^
+// - Двух вождей не бывает.
+//   ^^^^^^^^^^^
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:РОД ЧИСЛО:МН } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -546,7 +558,7 @@ pattern ЧислСущ
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -583,10 +595,12 @@ pattern ЧислСущ
 
 // они остановились на ста пятидесяти метрах
 //                     ^^^^^^^^^^^^^^^^^^^^^
+// Компания сделала прорыв сразу на двух направлениях.
+//                                  ^^^^^^^^^^^^^^^^^
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ПРЕДЛ } : export { ПАДЕЖ ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:ПРЕДЛ }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ПРЕДЛ [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.<ATTRIBUTE>c }
 
@@ -599,11 +613,13 @@ pattern ЧислСущ
 
 // пять очень спелых яблок лежат на полу
 // ^^^^^^^^^^^^^^^^^^^^^^^
+// По фактам произошедшего было возбуждено два уголовных дела.
+//                                         ^^^^^^^^^^^^^^^^^^
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ИМ ЧИСЛО:МН } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:РОД =c:ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -623,7 +639,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ИМ ЧИСЛО:ЕД } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ИМ ЧИСЛО:ЕД }
- obj=СущДляЧисл{ ПАДЕЖ:ИМ ЧИСЛО:ЕД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ИМ ЧИСЛО:ЕД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -637,7 +653,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:РОД ЧИСЛО:МН }
- obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:МН }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:МН [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -647,17 +663,19 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ВИН ЧИСЛО:МН }
- obj=СущДляЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
 // дети съели четыре сочных яблока
 //            ^^^^^^^^^^^^^^^^^^^^
+// Вскоре он увидел почти рядом два белых силуэта.
+//                              ^^^^^^^^^^^^^^^^^
 pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:МН } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:РОД ЧИСЛО:МН }
- obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -668,7 +686,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ВИН ЧИСЛО:ЕД } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ВИН ЧИСЛО:ЕД }
- obj=СущДляЧисл{ ПАДЕЖ:ВИН }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ВИН [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -679,7 +697,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:РОД ЧИСЛО:МН } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:РОД =c:ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:РОД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -689,7 +707,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:РОД ЧИСЛО:ЕД }
- obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:РОД ЧИСЛО:ЕД [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -701,7 +719,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ТВОР } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ТВОР =c:ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:ТВОР }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ТВОР [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -712,7 +730,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ДАТ } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ДАТ =c:ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:ДАТ }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ДАТ [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 
@@ -723,7 +741,7 @@ pattern ЧислСущ
 {
  c=ГруппаЧисл{ ПАДЕЖ:ПРЕДЛ } : export { ЧИСЛО ПАДЕЖ }
  adj=ГруппаПрилДляСущ{ ПАДЕЖ:ПРЕДЛ =c:ЧИСЛО }
- obj=СущДляЧисл{ ПАДЕЖ:ПРЕДЛ }:export { РОД ОДУШ node:root_node }
+ obj=СущДляЧисл{ ПАДЕЖ:ПРЕДЛ [-1]=c:РОД }:export { РОД ОДУШ node:root_node }
 }
 : links { obj.{ <ATTRIBUTE>c <ATTRIBUTE>adj } }
 

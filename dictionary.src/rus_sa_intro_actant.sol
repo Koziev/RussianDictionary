@@ -9,7 +9,78 @@ pattern МодальнСловосочет
  МодальСловосочет0 : export { node:root_node }
 }
 
+
+// Должно быть, проверял себя.
+// ^^^^^^^^^^^
+pattern МодальнСловосочет
+{
+ @probe_left(ЛевыйОграничительОборота)
+ w1='должно'{ class:прилагательное } : export { node:root_node }
+ w2=инфинитив:быть{}
+ @noshift(',')
+}
+: links { w1.<NEXT_COLLOCATION_ITEM>w2 }
+
+
+// Цепочка ", что ли" в роли вводного:
+//
+// Голову, что ли, потерял со страху?
+//         ^^^^^^
+// Не понимаете, что ли?
+//               ^^^^^^
+pattern МодальнСловосочет
+{
+ @probe_left(',')
+ adv=наречие:что{} : export { node:root_node }
+ p=ЧастицаЛи
+ @noshift(ПУНКТУАТОР:*{})
+}
+: links { adv.<POSTFIX_PARTICLE>p }
+: ngrams { 13 }
+
+
+// -------------------------------------------------------
+
+patterns ГруппаВводныхСлов export { node:root_node }
+
+// Насчет телефона она, конечно, сказала неправду.
+//                      ^^^^^^^
+pattern ГруппаВводныхСлов
+{
+ a=вводное:*{} : export { node:root_node }
+}
+
+// По-моему и по-твоему, получилось неплохо.
+// ^^^^^^^^^^^^^^^^^^^^^
+pattern ГруппаВводныхСлов
+{
+ a=вводное:*{} : export { node:root_node }
+ conj=ЛогичСоюз
+ b=вводное:*{}
+} : links { a.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>b }
+
+// -------------------------------------------------------
+
 patterns ВводнАктант export { node:root_node }
+
+
+// Получилось, по-моему, неплохо.
+//           ^^^^^^^^^^^
+pattern ВводнАктант
+{
+ comma1=','
+ z=ГруппаВводныхСлов : export { node:root_node }
+ @noshift(ПравыйОграничительОборота)
+ comma2=@coalesce(',')
+}
+: links
+{
+ z.{
+    <PUNCTUATION>comma1
+    ~<PUNCTUATION>comma2
+   }
+}
+: ngrams { 1 }
 
 
 pattern ВводнАктант

@@ -19,9 +19,25 @@ collocation_set ВводныеСловосочетания_ЧТО =
 // ^^^^^^^^
 pattern ВводнаяФраза
 {
+ @probe_left(ЛевыйОграничительОборота)
  w=ВВОДНОЕ:*{} : export { node:root_node }
  comma=','
-} : links { w.<PUNCTUATION>comma }
+}
+: links { w.<PUNCTUATION>comma }
+: ngrams { 2 }
+
+
+// - А по-моему, это очень нетрудно понять.
+//   ^^^^^^^^^^
+pattern ВводнаяФраза
+{
+ @probe_left(ВводнСоюз)
+ w=ВВОДНОЕ:*{} : export { node:root_node }
+ comma=','
+}
+: links { w.<PUNCTUATION>comma }
+: ngrams { 2 }
+
 
 
 // однако ж увидел перед глазами именно эти знаки.
@@ -56,6 +72,31 @@ pattern ВводнаяФраза
 }
 : links { z.<PUNCTUATION>comma2 }
 : ngrams { -3 }
+
+
+// О господи, помоги мне!
+// ^^^^^^^^^^
+pattern ВводнаяФраза
+{
+ p=частица:о{}
+ z=СущСПредложДоп{ ПАДЕЖ:ЗВАТ } : export { node:root_node }
+ comma2=','
+}
+: links { z.{ <PREFIX_PARTICLE>p <PUNCTUATION>comma2 } }
+: ngrams { -1 }
+
+// О боги, помоги же ему!
+// ^^^^^^^
+pattern ВводнаяФраза
+{
+ p=частица:о{}
+ z=СущСПредложДоп{ ПАДЕЖ:ИМ } : export { node:root_node }
+ comma2=','
+}
+: links { z.{ <PREFIX_PARTICLE>p <PUNCTUATION>comma2 } }
+: ngrams { -3 }
+
+
 
 
 pattern ВводнаяФраза
@@ -195,9 +236,11 @@ pattern ВводнаяФраза
 pattern ВводнаяФраза
 {
  pn=частица:ну{} : export { node:root_node }
- p2=местоим_сущ:что{}
+ p2=наречие:что{}
  comma=','
-} : links { pn.<NEXT_COLLOCATION_ITEM>p2.<PUNCTUATION>comma }
+}
+: links { pn.<NEXT_COLLOCATION_ITEM>p2.<PUNCTUATION>comma }
+: ngrams { 5 }
 
 
 // - Ну-ка посмотрим.

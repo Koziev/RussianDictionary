@@ -117,6 +117,7 @@ pattern ПритяжЧастица
 } : links { a.<POSTFIX_PARTICLE>p }
 
 
+
 pattern ГруппаПрил_Голова export { (РОД) (ПАДЕЖ) (ЧИСЛО) (ОДУШ) node:root_node }
 {
  ПритяжЧастица:export { node:root_node }

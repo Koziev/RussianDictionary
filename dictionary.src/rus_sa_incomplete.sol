@@ -4,39 +4,39 @@
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:им } : export { node:root_node }
-}
+} : ngrams { -2 }
 
 // Для существительного есть важная эмпирика - предложный падеж без предлога
 // обычно не употребляется.
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:род } : export { node:root_node }
-} : ngrams { -1 }
+} : ngrams { -3 }
 
 
 // чаю, греющего душу
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:парт } : export { node:root_node }
-} : ngrams { -1 }
+} : ngrams { -3 }
 
 
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:твор } : export { node:root_node }
-} : ngrams { -1 }
+} : ngrams { -3 }
 
 
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:вин } : export { node:root_node }
-} : ngrams { -1 }
+} : ngrams { -3 }
 
 
 pattern НеполнПредлож
 {
  ГруппаСущ4{ падеж:дат } : export { node:root_node }
-} : ngrams { -1 }
+} : ngrams { -3 }
 
 
 // - О  глупый  Петер,  сын угольщика! - воскликнул человечек
@@ -45,79 +45,94 @@ pattern НеполнПредлож
 {
  частица:о{}
  ГруппаСущ4{ падеж:им одуш:одуш } : export { node:root_node }
-} : ngrams { -2 }
+} : ngrams { -3 }
 
-
-// спасибо тебе за прогулку.
-
-// тут надо добавить генерацию уведомления, если нарушено правило связываемости
-patterns СущПредлСущ_Клоз export { node:root_node }
-pattern СущПредлСущ_Клоз
-{
- n1=СущСРодДоп{ падеж:им } : export { node:root_node }
- p=предлог:*{}
- n2=ГлДополнение{ =p:падеж }
-} : links { n1.<PREPOS_ADJUNCT>p.<OBJECT>n2 }
-  : ngrams { -1 } // так как не проверяем связываемость, то априори штрафуем
-
-
-pattern НеполнПредлож
-{
- СущПредлСущ_Клоз : export { node:root_node }
-}
-
-
-
-
-wordentry_set НаречиеВремени=наречие:{
- однажды
-}
 
 // Однажды в Китае и Америке
 pattern НеполнПредлож
 {
- НаречиеВремени : export { node:root_node }
- Предлог_В_НА
- ГруппаСущ4{ падеж:предл }
+ adv=ГруппаНареч2
+ p=Предлог_В_НА : export { node:root_node }
+ n=ГруппаСущ4{ падеж:предл }
 }
+: links { p.{ <ATTRIBUTE>adv <OBJECT>n } }
+: ngrams { -4 }
 
 
 
 // ------------------------------------------------------
 
-/*
-// ???
-patterns ПредлогПрилаг export { node:root_node }
-
-// Для последнего.
-pattern ПредлогПрилаг
-{
- p=предлог:*{} : export { node:root_node }
- a=ГруппаПрил2{ =p:падеж }
-} : links { p.<OBJECT>a }
-pattern НеполнПредлож { ПредлогПрилаг : export { node:root_node } } : ngrams { -1 }
-*/
-
-
-
 pattern НеполнПредлож { ГруппаНареч2 : export { node:root_node } }
+: ngrams { -4 }
+
 pattern НеполнПредлож { ГруппаСрНареч2 : export { node:root_node } }
+: ngrams { -4 }
+
 pattern НеполнПредлож { ГруппаПрил2 : export { node:root_node } }
+: ngrams { -3 }
+
 pattern НеполнПредлож { КраткПрил1 : export { node:root_node } }
+: ngrams { -3 }
+
 pattern НеполнПредлож { Обст : export { node:root_node } }
+: ngrams { -4 }
+
 pattern НеполнПредлож { ПричОборот2 : export { node:root_node } }
+: ngrams { -3 }
+
 pattern НеполнПредлож { ГруппаМест : export { node:root_node } }
+: ngrams { -4 }
 
 
 pattern НеполнПредлож { Инф2 : export { node:root_node } }
+: ngrams { -3 }
+
+
+// - Приготовить чай, мамочка?
+pattern НеполнПредлож
+{
+ v=Инф2 : export { node:root_node }
+ x=ПрямоеОбращение
+}
+: links { v.<APPEAL>x }
+: ngrams { -3 }
+
+// Господа, немедленно покинуть помещение!
+pattern НеполнПредлож
+{
+ x=ПрямоеОбращение
+ v=Инф2 : export { node:root_node }
+}
+: links { v.<APPEAL>x }
+: ngrams { -3 }
+
 
 // вот бы купить самолет!
 pattern НеполнПредлож
 {
  intro=ВводнаяФраза
  p=Инф2 : export { node:root_node }
-} : links { p.<BEG_INTRO>intro }
-  : ngrams { -1 }
+}
+: links { p.<BEG_INTRO>intro }
+: ngrams { -3 }
+
+
+// - А по-моему, это очень нетрудно понять.
+//   ^^^^^^^^^^
+pattern НеполнПредлож
+{
+ intro0=ВводнСоюз
+ intro=ВводнаяФраза
+ p=Инф2 : export { node:root_node }
+}
+: links
+{
+ p.{
+    <BEG_INTRO>intro0
+    <BEG_INTRO>intro
+   }
+}
+: ngrams { -3 }
 
 
 
@@ -138,22 +153,52 @@ pattern НеполнПредлож
  opener=СоюзКакВводн
  s=Инф2 : export { node:root_node }
 } : links { s.<BEG_INTRO>opener }
+: ngrams { -3 }
 
+// - А если откачать воду из минных труб?
+//   ^^^^^^
+pattern НеполнПредлож
+{
+ opener0=СоюзКакВводн0
+ opener=СоюзКакВводн
+ s=Инф2 : export { node:root_node }
+}
+: links { s.{ <BEG_INTRO>opener0 <BEG_INTRO>opener } }
+: ngrams { -3 }
+
+
+
+// Да, но где же взять двенадцатый?
+// ^^^^^^
+pattern НеполнПредлож
+{
+ intro=ВводнаяФраза
+ @probe_left(',')
+ opener=СоюзКакВводн
+ s=Инф2 : export { node:root_node }
+}
+: links
+{
+ s.{
+    <BEG_INTRO>intro
+    <BEG_INTRO>opener
+   }
+}
+: ngrams { -3 }
 
 
 
 pattern НеполнПредлож { Деепр2 : export { node:root_node } }
+: ngrams { -4 }
 
 pattern НеполнПредлож { ЧислСущ : export { node:root_node } }
+: ngrams { -3 }
+
 
 pattern НеполнПредлож
 {
  v=Сказуемое : export { node:root_node }
-}/*
-: ngrams
-{
- @tree_score(v,ВалентностьГлагола)
-}*/
+}
 
 
 // ЭТО в роли вводной частицы:
@@ -165,6 +210,7 @@ pattern НеполнПредлож
 } : links { p.<PREFIX_PARTICLE>x }
   : ngrams { -2 }
 
+
 // ну хватит об этом
 pattern НеполнПредлож
 {
@@ -173,6 +219,7 @@ pattern НеполнПредлож
 } : links { p.<BEG_INTRO>x }
   : ngrams { -2 }
 
+/*
 // Сказуемое с вводной конструкцией в роли неполного предложения:
 // В соответствии с шариатом, свинину употреблять запрещено
 pattern НеполнПредлож
@@ -180,7 +227,7 @@ pattern НеполнПредлож
  intro=ВводнаяФраза
  p=Сказуемое : export { node:root_node }
 } : links { p.<BEG_INTRO>intro }
-
+*/
 
 
 // Союз ЗАТО и другие как вводная частица:
@@ -189,9 +236,15 @@ pattern НеполнПредлож
 {
  conj=союз:*{}
  p=Сказуемое : export { node:root_node }
-} : links { p.<BEG_INTRO>conj }
+}
+: links { p.<BEG_INTRO>conj }
+: ngrams { -2 }
 
-pattern НеполнПредлож { ПредлогИСущ : export { node:root_node } }
+pattern НеполнПредлож
+{
+ ПредлогИСущ : export { node:root_node }
+}
+: ngrams { -5 }
 
 
 // был рад помочь
@@ -199,6 +252,7 @@ pattern НеполнПредлож
 {
  НеполнСвязка : export { node:root_node }
 }
+: ngrams { -1 }
 
 // ведь должны были сразу привести ее сюда.
 pattern НеполнПредлож

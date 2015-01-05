@@ -35,14 +35,14 @@ pattern ФИО_Имя0
 // ^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]") : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -5 }
 
 // Калинов осторожно обнял жену.
 // ^^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]") : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -5 }
 
 
@@ -53,14 +53,14 @@ pattern ФИО_Имя0
 // ^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]") : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -6 }
 
 // Джудиет рассматривала платье.
 // ^^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]") : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -6 }
 
 
@@ -142,9 +142,9 @@ pattern ФИО_Фамилия
 
 // Джордж Вашингтон был первым президентом США
 //        ^^^^^^^^^
-pattern ФИО_Фамилия export { node:root_node (ПАДЕЖ) }
+pattern ФИО_Фамилия
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node ПАДЕЖ }
 } : ngrams { -2 }
 
 
@@ -157,9 +157,9 @@ pattern ФИО_Отчество
  существительное:*{ CharCasing:FirstCapitalized ОДУШ:ОДУШ } : export { node:root_node ПАДЕЖ }
 } : ngrams { 1 }
 
-pattern ФИО_Отчество export { node:root_node (ПАДЕЖ) }
+pattern ФИО_Отчество
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { ПАДЕЖ node:root_node }
 } : ngrams { -1 }
 
 
@@ -212,7 +212,17 @@ pattern ФИО
 pattern ФИО
 {
  n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
- n2=ФИО_Фамилия{ =n1:ПАДЕЖ }
+ n2=ФИО_Фамилия{ [-1]=n1:ПАДЕЖ }
+}
+: links { n1.<RIGHT_NAME>n2 }
+: ngrams { 1 }
+
+// Позже позвонил мне Беляков Михаил.
+//                    ^^^^^^^^^^^^^^
+pattern ФИО
+{
+ n2=ФИО_Фамилия{}
+ n1=существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} CHARCASING:FirstCapitalized [-1]=n2:ПАДЕЖ } : export { node:root_node ПАДЕЖ РОД }
 }
 : links { n1.<RIGHT_NAME>n2 }
 : ngrams { 1 }
@@ -223,8 +233,8 @@ pattern ФИО
 pattern ФИО
 {
  n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
- n2=ФИО_Фамилия{ =n1:ПАДЕЖ }
- n3=ФИО_Отчество{ =n1:ПАДЕЖ }
+ n2=ФИО_Фамилия{ [-1]=n1:ПАДЕЖ }
+ n3=ФИО_Отчество{ [-1]=n1:ПАДЕЖ }
 } : links { n1.<RIGHT_NAME>n2.<RIGHT_NAME>n3 }
 
 
@@ -233,7 +243,7 @@ pattern ФИО
 pattern ФИО
 {
  n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
- n3=ФИО_Отчество{ =n1:ПАДЕЖ }
+ n3=ФИО_Отчество{ [-1]=n1:ПАДЕЖ }
 } : links { n1.<RIGHT_NAME>n3 }
 
 
@@ -309,10 +319,15 @@ pattern СущСРодДоп
 // предложный паттерн с ФИО:
 //
 // у А.С.Пушкина
+//
+// по возможности согласуем по падежу с валентностью предлога:
+//
+// Он был у Владимира Слепака.
+//        ^^^^^^^^^^^^^^^^^^^
 pattern ПредлогИСущ
 {
  prepos=предлог:*{}:export{ node:prepos node:root_node }
- n=ФИО:export{ node:root_node->n2 }
+ n=ФИО{ [-2]=prepos:ПАДЕЖ }:export{ node:root_node->n2 }
 } : links { prepos.<OBJECT>n }
 : ngrams
 {
@@ -378,9 +393,8 @@ pattern ПолучательОбращения
 pattern СущОбращение
 {
  n=существительное:*{ одуш:одуш число:ед }:export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- n2=ФИО_Имя{ =n:ПАДЕЖ }
+ n2=ФИО_Имя{ [-1]=n:ПАДЕЖ }
 } : links { n.<RIGHT_NAME>n2 }
-//  : ngrams { -1 }
 
 
 // студент Иван Петров
@@ -388,9 +402,8 @@ pattern СущОбращение
 pattern СущОбращение
 {
  n=существительное:*{ одуш:одуш число:ед }:export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- n2=ФИО{ =n:ПАДЕЖ }
+ n2=ФИО{ [-1]=n:ПАДЕЖ }
 } : links { n.<RIGHT_NAME>n2 }
-//  : ngrams { -1 }
 
 
 /*
@@ -408,9 +421,9 @@ pattern СущОбращение
 pattern СущОбращение
 {
  n=существительное:*{ одуш:одуш число:мн }:export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- n2=ФИО_Имя
+ n2=ФИО_Имя{ [-1]=n:ПАДЕЖ }
  conj=союз:и{}
- n3=ФИО_Имя
+ n3=ФИО_Имя{ [-1]=n:ПАДЕЖ }
 } : links
 {
  n.<RIGHT_NAME>n2.
