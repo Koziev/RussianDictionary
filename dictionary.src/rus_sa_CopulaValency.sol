@@ -1,4 +1,14 @@
 ﻿
+// Отель не большой
+// Ванная не очень большая
+tree_scorer ВалентностьНульСвязки language=Russian generic
+{
+ if context { adj=прилагательное:*{}.n=<SUBJECT>существительное:*{} }
+  then adj_noun_score(adj,n)
+}
+
+
+
 // Это мой карандаш
 // Это наше дело
 // Это царство жизни!
@@ -89,8 +99,24 @@ tree_scorer ОбстНульСвязки language=Russian
 tree_scorer ВалентностьНульСвязки language=Russian generic
 {
  if context { существительное:*{ ПАДЕЖ:ИМ }.[not]ОбстНульСвязки }
-  then -10
+  then -5
 }
+
+
+// Другое дело коммунисты
+tree_scorer ВалентностьНульСвязки language=Russian generic
+{
+ if context { *:*{ ПАДЕЖ:ИМ }.<SUBJECT>существительное:дело{ ПАДЕЖ:ИМ ЧИСЛО:ЕД }.<ATTRIBUTE>'другое' }
+  then 12
+}
+
+// Жуткое дело смотреть.
+tree_scorer ВалентностьНульСвязки language=Russian generic
+{
+ if context { ПодлежащееДляИндуцМод{ ПАДЕЖ:ИМ }.<OBJECT>инфинитив:*{} }
+  then 12
+}
+
 
 
 // -----------------------------------------------------------
@@ -118,10 +144,12 @@ tree_scorer ВалентностьНульСвязки language=Russian generic
 }
 
 
+// Особый учет для счетных наречий:
 // у вас много работы
+//       ^^^^^
 tree_scorer ВалентностьНульСвязки language=Russian generic
 {
- if context { существительное:*{ ПАДЕЖ:РОД }.<ATTRIBUTE>НаречДляРод0 }
+ if context { существительное:*{ ПАДЕЖ:РОД }.<ATTRIBUTE>НАРЕЧИЕ:*{ ТИП_МОДИФ:СУЩ } }
   then 7
 }
 

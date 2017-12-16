@@ -4,62 +4,55 @@
 
 // +++++++++++++++++++++++++++++++++++++++++++++
 
-patterns ЛогичЭлементСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+patterns ГоловаГруппыСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
-pattern ЛогичЭлементСущ_МНОЖ
+pattern ГоловаГруппыСущ_МНОЖ
 {
- ЛогичЭлементСущ:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ ГоловаГруппыСущ : export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
 
-pattern ЛогичЭлементСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО (ОДУШ) node:root_node }
+pattern ГоловаГруппыСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО (ОДУШ) node:root_node }
 {
- ГруппаМест:export{ РОД ПАДЕЖ ЧИСЛО node:root_node }
+ ГруппаМест : export { РОД ПАДЕЖ ЧИСЛО node:root_node }
+}
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++
+
+patterns ХвостГруппыСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+
+pattern ХвостГруппыСущ_МНОЖ
+{
+ ХвостГруппыСущ : export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+}
+
+pattern ХвостГруппыСущ_МНОЖ export { РОД ПАДЕЖ ЧИСЛО (ОДУШ) node:root_node }
+{
+ ГруппаМест : export { РОД ПАДЕЖ ЧИСЛО node:root_node }
 }
 
 // ---------------------------------------------------
 
-
-patterns МножСущВосх0 export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+// Признак KEYFEATURE_REQUIRED:0 => был присоединен второй и т.д. элемент
+// Признак KEYFEATURE_DESIRABLE:1 => в состав фразы вошел союз
+patterns МножСущВосх0 export { KEYFEATURE_DESIRABLE KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
 pattern МножСущВосх0
 {
- noun=ЛогичЭлементСущ_МНОЖ:export{ РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
-} : ngrams { -2 }
-
-
-/*
-// Кошка, собака, воробей жили на дереве
-// ^^^^^^^^^^^^^
-pattern МножСущВосх0
-{
- noun=ЛогичЭлементСущ_МНОЖ:export{ РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
- comma=','
- n2=ЛогичЭлементСущ_МНОЖ{ =Noun:Падеж }
+ noun=ГоловаГруппыСущ_МНОЖ:export{ KEYFEATURE_DESIRABLE:0 KEYFEATURE_REQUIRED:1 РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
 }
-: links { noun.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
-: ngrams { -1 }
-*/
-
-/*
-// Кошка и собака, воробей и голубь жили в домике
-// ^^^^^^^^^^^^^^
-pattern МножСущВосх0
-{
- noun=ЛогичЭлементСущ_МНОЖ:export{ РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
- conj=ЛогичСоюз
- n2=ЛогичЭлементСущ_МНОЖ{ =Noun:Падеж }
-}
-: links { noun.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
-*/
 
 
 // ---------------------------------------------------------
 
-patterns МножСущВосх { bottomup } export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+// Признак KEYFEATURE_DETECTED:1 есть перечисление или союзный паттерн
+
+patterns МножСущВосх { bottomup } export { KEYFEATURE_DETECTED KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
 pattern МножСущВосх
 {
- МножСущВосх0:export{ KEYFEATURE_REQUIRED:1 РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
+ МножСущВосх0:export{ KEYFEATURE_DETECTED:0 KEYFEATURE_REQUIRED:1 KEYFEATURE_DESIRABLE:0 РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node }
 }
 
 // Кошка, собака, воробей жили на дереве
@@ -68,12 +61,12 @@ pattern МножСущВосх
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pattern МножСущВосх
 {
- n1=МножСущВосх:export{ РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node KEYFEATURE_REQUIRED:0 }
- comma=','
- n2=ЛогичЭлементСущ_МНОЖ{ =n1:Падеж }
+ n1=МножСущВосх:export{ РОД ПАДЕЖ ЧИСЛО:МН ОДУШ node:root_node KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:0 }
+ comma=',' : export { KEYFEATURE_DETECTED:1 }
+ n2=ХвостГруппыСущ_МНОЖ{ =n1:Падеж }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
-: ngrams { 1 }
+
 
 
 // Мама и папа будут ругаться
@@ -81,8 +74,8 @@ pattern МножСущВосх
 pattern МножСущВосх
 {
  n1=МножСущВосх:export { РОД ПАДЕЖ ОДУШ ЧИСЛО:МН KEYFEATURE_REQUIRED:0 node:root_node }
- conj=ЛогичСоюз
- n2=ЛогичЭлементСущ_МНОЖ{ =n1:ПАДЕЖ }
+ conj=ЛогичСоюз : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
+ n2=ХвостГруппыСущ_МНОЖ{ =n1:ПАДЕЖ }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
 : ngrams { 2 }
@@ -91,10 +84,25 @@ pattern МножСущВосх
 
 patterns МножСущФинал export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
+
+// В состав группы вошел хотя бы один союз:
+//
+// Кошка и собака, воробей и голубь жили в домике
+// ^^^^^^^^^^^^^^
 pattern МножСущФинал
 {
- МножСущВосх{ KEYFEATURE_REQUIRED:0 } : export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ МножСущВосх{ ~НеЭлементСоюзнГруппы KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:1 } : export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
+
+// В состав группы не вошел ни один союз:
+//
+// Кошка, собака, воробей жили на дереве
+// ^^^^^^^^^^^^^
+pattern МножСущФинал
+{
+ МножСущВосх{ ~НеЭлементСоюзнГруппы KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:0 } : export { РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+} : ngrams { -1 }
+
 
 
 // ---------------------------------------------------
@@ -201,7 +209,9 @@ pattern ГруппаСущ4
 } 
 : ngrams { ВалентностьСущ(n) }
 
+
 // отдай это усталым дяде и тете
+//           ^^^^^^^^^^^^^^^^^^^
 pattern ГруппаСущ4
 {
  a=ГруппаПрил2{ ЧИСЛО:МН }
@@ -215,8 +225,8 @@ pattern ГруппаСущ4
 }
 
 
-
 // назвать поименно мастеров и гроссмейстера, участвовавших в том матче
+//                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pattern ГруппаСущ4
 {
  n=ИменнаяГруппа_МНОЖ:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }

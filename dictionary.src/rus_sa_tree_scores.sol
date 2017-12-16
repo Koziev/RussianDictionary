@@ -1,4 +1,4 @@
-﻿// LC->07.11.2014
+﻿// LC->24.10.2015
 
 tree_scorers ОдушОбъект
 
@@ -235,27 +235,6 @@ tree_scorer language=Russian
 
 
 
-
-
-tree_scorers Когда
-
-wordentry_set НаречияВремениКогда=наречие:{
- весной, летом, осенью, зимой, днем, вечером, утром, ночью
-}
-
-tree_scorer Когда language=Russian
-{
- if context { НаречияВремениКогда }
-  then 1
-}
-
-// Перелетные птицы возвращаются весной.
-//                  ^^^^^^^^^^^^ ^^^^^^
-tree_scorer ВалентностьГлагола language=Russian
-{
- if context { rus_verbs:возвращаться{}.Когда }
-  then 1
-}
 
 
 // давно хотел взять его рабочий телефон.
@@ -655,6 +634,8 @@ tree_scorer ВалентностьГлагола language=Russian
 }
 
 
+// ---------------------------------------------------------------------------
+
 // Дать+местоимение - обычно местоимение в дательном падеже:
 // Я не дам им ничего
 //      ^^^^^^
@@ -662,15 +643,29 @@ tree_scorer ВалентностьГлагола language=Russian
 //            ^^^^       ^^^^^^
 tree_scorer ВалентностьГлагола language=Russian
 {
- if context { глагол:дать{}.<OBJECT>*:*{ падеж:дат } }
+ if context { глагол:дать{}.{ <OBJECT>*:*{ падеж:вин } <OBJECT>*:*{ падеж:дат } } }
   then 5
 }
 
 tree_scorer ВалентностьГлагола language=Russian
 {
- if context { инфинитив:дать{}.<OBJECT>*:*{ падеж:дат } }
+ if context { инфинитив:дать{}.{ <OBJECT>*:*{ падеж:вин } <OBJECT>*:*{ падеж:дат } } }
   then 5
 }
+
+
+
+// Артиллерии дам много.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:дать{}.{ <OBJECT>*:*{ ПАДЕЖ:РОД } наречие:много{} } }
+  then 6
+}
+
+// ---------------------------------------------------------------------------
+
+
+
 
 
 
@@ -946,7 +941,7 @@ tree_scorer ВалентностьГлагола language=Russian
 
 
 
-
+/*
 // Мы помогли ему влезть в лодку.
 //    ^^^^^^^^^^^^^^^^^^
 tree_scorer ВалентностьГлагола language=Russian
@@ -957,8 +952,10 @@ tree_scorer ВалентностьГлагола language=Russian
                                   } }
   then 5
 }
+*/
 
 
+/*
 // Разрешите вас пригласить?
 // ^^^^^^^^^^^^^
 tree_scorer ВалентностьГлагола language=Russian
@@ -966,7 +963,7 @@ tree_scorer ВалентностьГлагола language=Russian
  if context { rus_verbs:пригласить{}.<OBJECT>*:*{ падеж:вин } }
   then 1
 }
-
+*/
 
 // неторопливо допил прохладный сок.
 //             ^^^^^            ^^^
@@ -1157,41 +1154,6 @@ tree_scorer language=Russian
  if context { прилагательное:*{ причастие }.'с'.'участием' }
   then 1
 }
-
-
-
-
-/*
-tree_scorer language=Russian
-{
- if context { *:*{}.<OBJECT>'вечером'{ class:существительное } }
-  then -1
-}
-
-tree_scorer language=Russian
-{
- if context { *:*{}.<OBJECT>'ночью'{ class:существительное } }
-  then -1
-}
-
-
-tree_scorer language=Russian
-{
- if context { *:*{}.<OBJECT>'днем'{ class:существительное } }
-  then -1
-}
-
-
-tree_scorer language=Russian
-{
- if context { *:*{}.<OBJECT>'утром'{ class:существительное } }
-  then -1
-}
-*/
-
-
-
-
 
 
 // Она оправдала неявку на занятия болезнью.
@@ -2093,6 +2055,7 @@ tree_scorer ВалентностьГлагола language=Russian
 }
 
 
+/*
 wordentry_set НаречВремСуток=наречие:{ утром, вечером, днем, ночью }
 // она вечером будет есть пюре
 tree_scorer ВалентностьГлагола language=Russian
@@ -2103,7 +2066,7 @@ tree_scorer ВалентностьГлагола language=Russian
                             } }
   then 1
 }
-
+*/
 
 
 
@@ -2121,7 +2084,7 @@ tree_scorer ВалентностьГлагола language=Russian
   then 1
 }
 
-
+/*
 // она утром будет есть пюре
 tree_scorer ВалентностьГлагола language=Russian
 {
@@ -2177,6 +2140,7 @@ tree_scorer ВалентностьГлагола language=Russian
  if context { ГлаголыПоедания_Вин.<ATTRIBUTE>наречие:ночью{} }
   then 1
 }
+*/
 
 
 // желая стать космонавтом
@@ -2199,7 +2163,7 @@ tree_scorer ВалентностьГлагола language=Russian
 //                   ^^^^^^^^^^
 tree_scorer language=Russian
 {
- if context { прилагательное:видный{ краткий }.наречие:днем{} }
+ if context { прилагательное:видный{ краткий }.<ATTRIBUTE>'днем'{} }
   then 1
 }
 
@@ -2331,17 +2295,6 @@ tree_scorer ВалентностьГлагола language=Russian
   then -1
 }
 
-
-
-// наречия, совпадающие с формами существительных
-wordentry_set НаречСущТвор=наречие:{ утром, вечером, днем, ночью }
-
-// Вечером на веранду явится кошка.
-tree_scorer ВалентностьГлагола language=Russian
-{
- if context { rus_verbs:явиться{}.НаречСущТвор }
-  then 1
-}
 
 
 
@@ -2481,7 +2434,7 @@ tree_scorer ВалентностьГлагола language=Russian
 //       ^^^^
 tree_scorer ВалентностьГлагола language=Russian
 {
- if context { глагол:есть{}.существительное:день{ падеж:твор } }
+ if context { глагол:есть{}.<OBJECT>существительное:день{ падеж:твор } }
   then -1
 }
 
@@ -2494,13 +2447,14 @@ tree_scorer ВалентностьГлагола language=Russian
   then 1
 }
 
-
+/*
 // Планета Марс видна утром
 tree_scorer language=Russian
 {
  if context { прилагательное:видный{}.наречие:утром{} }
   then 1
 }
+*/
 
 /*
 // Повысим достоверность безличного глагола.
@@ -3880,7 +3834,7 @@ tree_scorer ВалентностьГлагола language=Russian generic { if c
 tree_scorer ВалентностьГлагола language=Russian generic { if context { прилагательное:*{ причастие краткий }.<ATTRIBUTE>наречие:как обычно{} } then 7 }
 
 
-
+/*
 // наречие КАК обычно не стоит справа от глагола в одиночку.
 // убью как собаку.
 //      ^^^^^^^^^^
@@ -3889,6 +3843,7 @@ tree_scorer ВалентностьГлагола language=Russian generic
  if context { *:*{1}.<ATTRIBUTE>наречие:как{2}.[not]*:*{} }
   then -10
 }
+*/
 
 
 // Олег вытянул вперед руки
@@ -4869,6 +4824,7 @@ tree_scorer ВалентностьГлагола language=Russian
   then 2
 }
 
+/*
 // В День Воли белорусов призвали побороть страх и лень
 //             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 tree_scorer ВалентностьГлагола language=Russian 
@@ -4891,7 +4847,7 @@ tree_scorer ВалентностьГлагола language=Russian
             }
   then 5
 }
-
+*/
 
 
 
@@ -5113,7 +5069,7 @@ tree_scorer ВалентностьГлагола language=Russian
 //
 // а сегодняшний день обещал быть именно таким
 // лето должно быть именно таким
-
+/*
 tree_scorer ВалентностьПредиката language=Russian generic
 {
  if context { *:*{ модальный }.{
@@ -5149,7 +5105,7 @@ tree_scorer ВалентностьПредиката language=Russian generic
                                } }
   then 1
 }
-
+*/
 
 
 // --------------------------------------------------
@@ -5419,27 +5375,7 @@ tree_scorer ВалентностьГлагола language=Russian
 }
 
 
-// Не было смысла позволять другим найти ход
-tree_scorer ВалентностьГлагола language=Russian
-{
- if context { rus_verbs:позволять{}.{
-                                     <OBJECT>*:*{ ПАДЕЖ:ДАТ }
-                                     инфинитив:*{}
-                                    }
-            }
-  then 5
-}
 
-// приказывать секретарше принести кофе
-tree_scorer ВалентностьГлагола language=Russian
-{
- if context { rus_verbs:приказывать{}.{
-                                       <OBJECT>*:*{ ПАДЕЖ:ДАТ }
-                                       инфинитив:*{}
-                                      }
-            }
-  then 5
-}
 
 // нет больше вашего дракона
 tree_scorer language=Russian
@@ -5639,6 +5575,19 @@ tree_scorer ВалентностьГлагола language=Russian
  if context { rus_verbs:узнать{}.<OBJECT>НеодушОбъект{ падеж:дат } }
   then -1
 }
+
+
+// Предпочитаем одушевленный объект в конструкции:
+//
+// Узнать от соседей
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:узнать{}.<PREPOS_ADJUNCT>предлог:от{}.<OBJECT>НеодушОбъект{ падеж:род } }
+  then -2
+}
+
+
+
 
 
 // Общее правило для побудительного наклонения: явный субъект не
@@ -7094,6 +7043,7 @@ tree_scorer ВалентностьПредиката language=Russian
 
 // +++++++++++++++++++++++++
 
+/*
 // пища помогла мне окончательно прогнать сон
 tree_scorer ВалентностьПредиката language=Russian
 {
@@ -7105,6 +7055,7 @@ tree_scorer ВалентностьПредиката language=Russian
             }
   then 5
 }
+*/
 
 // +++++++++++++++++
 
@@ -7205,7 +7156,7 @@ tree_scorer ВалентностьПредиката language=Russian
                              <RHEMA>*:*{ одуш:неодуш падеж:им }
                             }
             }
-  then -5
+  then -3
 }
 
 tree_scorer ВалентностьПредиката language=Russian
@@ -7215,7 +7166,7 @@ tree_scorer ВалентностьПредиката language=Russian
                              <SUBJECT>существительное:*{ одуш:неодуш падеж:им }
                             }
             }
-  then -8
+  then -3
 }
 
 // Компаратив наречия для БЫТЬ/БЫВАТЬ подавляем
@@ -7383,6 +7334,18 @@ tree_scorer ВалентностьПредиката language=Russian generic
             }
   then adj_noun_score(rhema,thema)
 }
+
+
+// Выбор фруктов слаб
+tree_scorer ВалентностьПредиката language=Russian generic
+{
+ if context { a=прилагательное:*{ КРАТКИЙ}.n=<SUBJECT>СУЩЕСТВИТЕЛЬНОЕ:*{}
+            }
+  then adj_noun_score(a,n)
+}
+
+
+
 
 // Воздух становился всё холоднее
 // ^^^^^^                ^^^^^^^^
@@ -7676,6 +7639,30 @@ tree_scorer ВалентностьПредиката language=Russian generic
                          } }
   then 2
 }
+
+
+// День выдался ненастный.
+tree_scorer ВалентностьПредиката language=Russian generic
+{
+ if context { *:*{}.{ sbj=<SUBJECT>существительное:*{} attr=<SEPARATE_ATTR>прилагательное:*{ ПАДЕЖ:ИМ =sbj:РОД =sbj:ЧИСЛО } } }
+  then adj_noun_score(attr,sbj)
+}
+
+
+// Такое было удовольствие!
+tree_scorer ВалентностьПредиката language=Russian generic
+{
+ if context { глагол:быть{}.{
+                             n3=<SUBJECT>*:*{}
+                             attr=<SEPARATE_ATTR>*:*{ ПАДЕЖ:ИМ =n3:РОД =n3:ЧИСЛО }
+                            } }
+  then adj_noun_score(attr,n3)
+}
+
+
+
+
+
 
 // Ответы я давал самые несуразные.
 // ^^^^^^               ^^^^^^^^^^
@@ -8108,3 +8095,793 @@ tree_scorer ВалентностьГлагола language=Russian generic
  if context { rus_verbs:оказаться{}.<PREPOS_ADJUNCT>предлог:в{}.'поле'{ РОД:СР ПАДЕЖ:ПРЕДЛ }.'зрения' }
   then 2
 }
+
+
+// Я пересекла двор и села рядом с ней.
+//                    ^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:сесть{}.<PREPOS_ADJUNCT>предлог:с{}.<ATTRIBUTE>наречие:рядом{} }
+  then 2
+}
+
+
+// Я всегда стою, обучая кого-то.
+// ^^       ^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:стоить{}.<SUBJECT>местоимение:я{ лицо:1 } }
+  then -2
+}
+
+// Окончив первый, принялся за второй.
+//                 ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:приняться{}.<PREPOS_ADJUNCT>предлог:за{}.*:*{ ПАДЕЖ:ТВОР } }
+  then -2
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:приниматься{}.<PREPOS_ADJUNCT>предлог:за{}.*:*{ ПАДЕЖ:ТВОР } }
+  then -2
+}
+
+
+// Оставшихся в живых они же заперли в резервациях.
+// ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:остаться{}.<PREPOS_ADJUNCT>предлог:в{}.'живых' }
+  then 2
+}
+
+// Ворованные автомобили злоумышленники разбирали на запчасти и продавали.
+//                                      ^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:разбирать{}.<PREPOS_ADJUNCT>предлог:на{}.существительное:*{ падеж:вин одуш:неодуш } }
+  then 2
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:разобрать{}.<PREPOS_ADJUNCT>предлог:на{}.существительное:*{ падеж:вин одуш:неодуш } }
+  then 2
+}
+
+// Белолобый неприязненно смерил его взглядом.
+//                        ^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:смерить{}.{ <OBJECT>*:*{ падеж:вин } <OBJECT>'взглядом' } }
+  then 2
+}
+
+
+// Безмерно нибелунги о Зигфриде грустили.
+//                    ^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:грустить{}.<PREPOS_ADJUNCT>предлог:о{}.<OBJECT>*:*{ падеж:предл } }
+  then 1
+}
+
+
+// Блондин потащил девчонку к двери;
+//                 ^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:потащить{}.<PREPOS_ADJUNCT>предлог:к{} }
+  then 1
+}
+
+
+// Сняв шляпу, Рэнналф прибавил шагу.
+//                     ^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:прибавить{}.<OBJECT>'шагу'{ падеж:парт } }
+  then 3
+}
+
+
+// Хвалю я ее за это?
+// ^^^^^      ^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:хвалить{}.<PREPOS_ADJUNCT>предлог:за{}.<OBJECT>*:*{ падеж:вин } }
+  then 2
+}
+
+// Александр улыбнулся, пожирая её глазами.
+//                      ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:пожирать{}.{ <OBJECT>*:*{ ПАДЕЖ:ВИН } 'глазами' } }
+  then 2
+}
+
+
+// мне будет сорок один год
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { глагол:быть{ число:ед лицо:3 время:будущее }.
+              {
+               <SUBJECT>существительное:год{}.числительное:*{}
+               <OBJECT>*:*{ падеж:дат }
+              }
+            }
+  then 2
+}
+
+// Мне было двадцать три года.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { глагол:быть{ число:ед род:ср время:прошедшее }.
+              {
+               <SUBJECT>существительное:год{}.числительное:*{}
+               <OBJECT>*:*{ падеж:дат }
+              }
+            }
+  then 2
+}
+
+// Устойчивый оборот: принять участие в чем-то:
+//
+// В экспедиции приняли участие много иностранцев.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:принять{}.{ <OBJECT>существительное:участие{ ПАДЕЖ:ВИН } <PREPOS_ADJUNCT>предлог:в{}.*:*{ падеж:предл } } }
+  then 1
+}
+
+// Женщина и ребенок с ног валились.
+//                   ^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:валиться{}.'с'.'ног' }
+  then 2
+}
+
+
+// Ведет оседлый и полуоседлый образ жизни.
+// ^^^^^                       ^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:вести{}.<OBJECT>'образ'.'жизни' }
+  then 2
+}
+
+
+// Я обещался в точности исполнить поручение.
+//            ^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:исполнить{}.'в'.'точности'{ падеж:предл } }
+  then 2
+}
+
+
+
+// Впрочем, может быть и меньше.
+//                       ~~~~~~
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { СчетнСвязка.[not]<OBJECT>*:*{} }
+  then -3
+}
+
+
+// Проехали километра два.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:проехать{}.<OBJECT>существительное:километр{} }
+  then 4
+}
+
+// Прошли пять километров
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:пройти{}.<OBJECT>существительное:километр{} }
+  then 4
+}
+
+// Пройдет много лет.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:пройти{}.<SUBJECT>'лет'.'много' }
+  then 4
+}
+
+// Ничего не видит.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:видеть{}.<SUBJECT>'ничего' }
+  then -4
+}
+
+// Ничего не знает.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:знать{}.<SUBJECT>'ничего' }
+  then -4
+}
+
+// Ничего не боится.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:бояться{}.<SUBJECT>'ничего' }
+  then -4
+}
+
+// Взяли в клещи.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:взять{}.'в'.'клещи'{ ПАДЕЖ:ВИН} }
+  then 2
+}
+
+// К вам пришли!
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:придти{}.'к'.*:*{ ПАДЕЖ:ДАТ } }
+  then 1
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:прийти{}.'к'.*:*{ ПАДЕЖ:ДАТ } }
+  then 1
+}
+
+// Сергиенко воспользовался моментом.
+//           ^^^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:воспользоваться{}.[not]<OBJECT>*:*{ ПАДЕЖ:ТВОР } }
+  then -1
+}
+
+
+
+
+// Готовиться времени нет.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { частица:нет{}.'времени'.<INFINITIVE>инфинитив:*{} }
+  then 4
+}
+
+// Дал время подумать.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:дать{}.<OBJECT>существительное:время{ падеж:вин }.<INFINITIVE>инфинитив:*{} }
+  then 4
+}
+
+// -------------------------------------------------------------------------------
+
+// Ночь выдается беспокойная.
+// ^^^^^^^^^^^^^
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:выдаваться{}.<SUBJECT>СущСоЗначВремКакОбст1{ ПАДЕЖ:ИМ } }
+  then 4
+}
+
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:выдаться{}.<SUBJECT>СущСоЗначВремКакОбст1{ ПАДЕЖ:ИМ } }
+  then 4
+}
+
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:выдаваться{}.<ATTRIBUTE>СущСоЗначВремКакОбст1{} }
+  then -10
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:выдаться{}.<ATTRIBUTE>СущСоЗначВремКакОбст1{} }
+  then -10
+}
+
+
+// -------------------------------------------------------------------------------
+
+
+// Что говорит свинец?
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:говорить{}.<SUBJECT>местоим_сущ:что{} }
+  then -3
+}
+
+
+// В детях эта программа усиливается во много раз.
+//                                   ^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:усиливаться{}."во"."раз"."много" }
+  then 5
+}
+
+
+// Я посмотрел на часы.
+//   ^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:посмотреть{}."на".*{ ПАДЕЖ:ВИН } }
+  then 3
+}
+
+// К вам пришли!
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:придти{}."к".ОдушОбъект }
+  then 3
+}
+
+// Он бросил взгляд на часы. (БРОСИТЬ ВЗГЛЯД НА что-то)
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:бросить{}.{ <OBJECT>"взгляд"{ ПАДЕЖ:ВИН } <PREPOS_ADJUNCT>"на".*:*{ ПАДЕЖ:ВИН } } }
+  then 3
+}
+
+// Женщина и ребенок с ног валились. (ВАЛИТЬСЯ С НОГ)
+//                   ^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:валиться{}."с"."ног" }
+  then 3
+}
+
+// стыдно ребятам в глаза смотреть. (СМОТРЕТЬ В ГЛАЗА)
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:смотреть{}."в"."глаза"{ ПАДЕЖ:ВИН } }
+  then 3
+}
+
+// Надежнее иметь дело со взрослыми. (ИМЕТЬ ДЕЛО С кем-то/чем-то)
+//          ^^^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:иметь{}.{ <OBJECT>существительное:дело{ падеж:вин } <PREPOS_ADJUNCT>предлог:с{}.*:*{ ПАДЕЖ:ТВОР } } }
+  then 3
+}
+
+// Вдохновлял он ее и на поэмы. (ВДОХНОВЛЯТЬ/ВДОХНОВИТЬ НА что-то)
+// ^^^^^^^^^^       ^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:вдохновлять{}.<PREPOS_ADJUNCT>предлог:на{}.*:*{ ПАДЕЖ:ВИН } }
+  then 3
+}
+
+
+// Оставшихся в живых они же заперли в резервациях. (ОСТАТЬСЯ В ЖИВЫХ)
+// ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:остаться{}.<PREPOS_ADJUNCT>предлог:в{}.'живых' }
+  then 3
+}
+
+
+// Я стояла, провожая его взглядом. (ПРОВОЖАТЬ кого-то/что-то ВЗГЛЯДОМ)
+//           ^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:провожать{}.{ <OBJECT>*:*{ ПАДЕЖ:ВИН } 'взглядом' } }
+  then 3
+}
+
+
+// Эпидемии гриппа не ожидается
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { "ожидается".{ <OBJECT>*:*{ ПАДЕЖ:РОД } 'не' } }
+  then 3
+}
+
+// --------------------------------------------------------------------------
+
+// Прикажи дать коньяку.
+//         ^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:дать{}.<OBJECT>*:*{ ПАДЕЖ:ПАРТ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:НАПИТОК{} } }
+  then 6
+}
+
+// Там дела важнее.
+//     ^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { 'дела'.<ATTRIBUTE>НАРЕЧИЕ:*{ СТЕПЕНЬ:СРАВН } }
+  then -10
+}
+
+// --------------------------------------------------------------------
+
+// Что делает Танасчишин?
+// ~~~~~~~~~~
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:делать{}.<SUBJECT>местоим_сущ:что{} }
+  then -3
+}
+
+// -------------------------------------------------------
+// Нельзя допустить атрофии.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { инфинитив:допустить{}.{ <LEFT_AUX_VERB>безлич_глагол:Нельзя{} <OBJECT>*:*{ падеж:род } } }
+  then 3
+}
+
+// --------------------------------------------------------
+// Надо Дорошенко сказать.
+//      ^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:сказать{}.<OBJECT>существительное:*{ ОДУШ:ОДУШ ПАДЕЖ:ТВОР } }
+  then -5
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:сказать{}.<OBJECT>существительное:*{ ОДУШ:ОДУШ ПАДЕЖ:ВИН } }
+  then -5
+}
+
+// --------------------------------------------------------------
+// Тем не менее досталось всем.
+//              ^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:достаться{}.<ATTRIBUTE>'всем'{ ПАДЕЖ:ТВОР } }
+  then -20
+}
+
+
+// Наконец достигли вершины.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:достичь{}.<OBJECT>НеодушОбъект{ ПАДЕЖ:РОД } }
+  then 3
+}
+
+
+
+// --------------------------------------------------------------
+// Возглавляет его мэр.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:возглавлять{}.[not]<OBJECT>*:*{ ПАДЕЖ:ВИН } }
+  then -3
+}
+
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:возглавлять{}.<OBJECT>существительное:*{ ПАДЕЖ:ВИН } }
+  then -3
+}
+
+/*
+// Засыпаю его вопросами.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:засыпать{ ПЕРЕХОДНОСТЬ:ПЕРЕХОДНЫЙ }.{ <OBJECT>*:*{ ПАДЕЖ:ВИН } <OBJECT>'вопросами' } }
+  then 2
+}
+*/
+
+
+
+
+// Разбудила его Надя.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:разбудить{}.{ <OBJECT>*:*{ ПАДЕЖ:ВИН } <SUBJECT>*:*{} } }
+  then 2
+}
+
+// Прошло две недели.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { 'прошло'.<SUBJECT>СущСоЗначВрем{ ПАДЕЖ:РОД }.числительное:*{} }
+  then 2
+}
+
+
+// Я просидел дома весь день
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:просидеть{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+ 
+// Сегодня я весь день читал.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:читать{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+// я буду работать весь день
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:работать{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+// вместе они шли весь день.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:идти{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+// бой продолжался весь день.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:продолжаться{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+
+// битва длилась весь день.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:длиться{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'весь'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+// мы играли во дворе целый день
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:играть{}.<ATTRIBUTE>'день'{ ПАДЕЖ:ВИН }.<ATTRIBUTE>'целый'{ ПАДЕЖ:ВИН } }
+  then 2
+}
+
+// У меня к тебе дело
+//        ~~~~~~~~~~~
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:деть{ род:ср }.предлог:к{}.*:*{ падеж:дат } }
+  then -10
+}
+
+
+// дайте им три часа.
+// ^^^^^    ^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:дать{}.<OBJECT>существительное:час{}.числительное:*{} }
+  then 5
+}
+
+
+// Важное значение имеет и нестационарность Метагалактики.
+// ^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:иметь{}.<OBJECT>существительное:значение{}.'важное' }
+  then 10
+}
+
+
+
+// Я не теряю надежды.
+//   ^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:терять{}.{ <NEGATION_PARTICLE>частица:не{} <OBJECT>существительное:надежда{ падеж:род число:ед } } }
+  then 1
+}
+
+
+// Вы не знаете Дезире?
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:знать{}.<OBJECT>существительное:*{ одуш:одуш падеж:твор } }
+  then -5
+}
+
+// Я целую Викторию...
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:целовать{}.<OBJECT>существительное:*{ одуш:одуш падеж:дат } }
+  then -5
+}
+
+// Благоустройство кладбища продолжалось и летом.
+//                          ^^^^^^^^^^^^   ^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:продолжаться{}.<ATTRIBUTE>существительное:лето{ падеж:твор } }
+  then 5
+}
+
+// ----------------------------------------------------------------
+
+// Ей нужен был отдых.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { прилагательное:нужный{ краткий }.'ей'{ падеж:твор } }
+  then -5
+}
+
+
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { прилагательное:нужный{ краткий }.'им'{ падеж:твор } }
+  then -5
+}
+
+
+// - Я тебе дам знать .
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { инфинитив:знать{}.rus_verbs:дать{} }
+  then 5
+}
+
+// Для отправителя они не представляли опасности.
+//                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:представлять{}.'опасности'{ ПАДЕЖ:РОД } }
+  then 5
+}
+
+// К вам это не имело отношения.
+//           ^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { глагол:иметь{}.'отношения'{ ЧИСЛО:МН } }
+  then -1
+}
+
+// ты встала на его пути
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:встать{}.'на'.'пути'{ ПАДЕЖ:ВИН } }
+  then -2
+}
+
+
+// Она хотела стать моей
+//     ^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:хотеть{}.<OBJECT>существительное:стать{} }
+  then -10
+}
+
+
+// откуда нам это знать?
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { инфинитив:знать{}.{ <ATTRIBUTE>наречие:откуда{} <OBJECT>*:*{ падеж:дат } } }
+  then 2
+}
+
+
+// друид встал на их пути
+//       ^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:встать{}.<PREPOS_ADJUNCT>предлог:на{}.<OBJECT>существительное:путь{ падеж:вин } }
+  then -2
+}
+
+// «Мы вытолкнули Украину из Русского мира»
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:вытолкнуть{}.<PREPOS_ADJUNCT>предлог:из{} }
+  then 2
+}
+
+// Владимир Путин объявил финансовые пирамиды вне закона
+//                ^^^^^^^                     ^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:объявить{}.<PREPOS_ADJUNCT>предлог:вне{} }
+  then 2
+}
+
+
+// Содержание их было однообразно.  
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rhema=прилагательное:*{ КРАТКИЙ ЧИСЛО:ЕД РОД:СР }.{ thema=<SUBJECT>существительное:*{ ЧИСЛО:ЕД РОД:СР } } }
+  then adj_noun_score(rhema,thema)
+}
+
+// Отдам краснохвостого сома в хорошие руки
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:отдать{}.предлог:в{}.'руки'.'хорошие' }
+  then 5
+}
+
+// ----------------------------------------------------------------
+
+// Приобретает массовый характер Стахановское движение.
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:приобретать{}.<OBJECT>существительное:характер{}.<ATTRIBUTE>прилагательное:массовый{} }
+  then 5
+}
+
+// Фашистские стрелки открывают ответный огонь.
+tree_scorer ВалентностьПредиката language=Russian
+{
+ if context { rus_verbs:открывать{}.{ <SUBJECT>существительное:стрелок{} <OBJECT>существительное:огонь{} } }
+  then 5
+}
+
+// Документы эти разрабатывались соответствующими начальниками.
+// Старый хрыч обернулся добродушным дедулей.
+tree_scorer ВалентностьГлагола language=Russian generic
+{
+ if context { глагол:*{}.<ATTRIBUTE>существительное:*{ падеж:твор одуш:одуш } }
+  then -2
+}
+
+
+// Он смотрел на танцующих вытаращенными глазами.
+//    ^^^^^^^^^^^^^^^^^^^^
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:смотреть{}.предлог:на{}.прилагательное:*{ падеж:предл } }
+  then -5
+}
+
+
+// ----------------------------------------------------------------
+
+#define vap(v,adv,p,w) \
+#begin
+tree_scorer ВалентностьГлагола language=Russian
+{
+ if context { rus_verbs:v{}.<PREPOS_ADJUNCT>ПРЕДЛОГ:p{}.<ATTRIBUTE>НАРЕЧИЕ:adv{} }
+  then w
+}
+#end
+
+vap(стоять,впритык,к,1) // Шкаф стоит впритык к столу.
+vap(стоять,вплотную,к,1) // Шкаф стоит вплотную к столу.
+vap(бежать,следом,за,2) // она как раз начала бежать следом за ним
+vap(быть,рядом,с,2) // он был рядом с дверью
+vap(пойти,следом,за,2) // Катя пошла следом за ними.
+
+// Я приехал в Москву одновременно с братом.
+//   ^^^^^^^          ^^^^^^^^^^^^^^
+vap(приехать,одновременно,с,1)
+vap(прийти,одновременно,с,1)
+vap(прибыть,одновременно,с,1)
+vap(появиться,одновременно,с,1)
+
+// Петя положил яблоки вместе с картошкой.
+//      ^^^^^^^        ^^^^^^^^
+vap(положить,вместе,с,1)
+vap(ложить,вместе,с,1)
+vap(положить,слева,от,2) // Положи книгу слева от тетради
+
+vap(глядеть,прямо,в,5) // глядя прямо в ее круглые карие глаза, произнес
+vap(посмотреть,прямо,в,5)
+vap(смотреть,прямо,в,5)
+vap(заглянуть,прямо,в,5)
+vap(швырнуть,прямо,в,5) // Он подлетает к башне и... сейчас кибер швырнет нашего  гладиатора прямо в ее пустую утробу.
+vap(швырять,прямо,в,5)
+vap(кинуть,прямо,в,5)
+vap(кидать,прямо,в,5)

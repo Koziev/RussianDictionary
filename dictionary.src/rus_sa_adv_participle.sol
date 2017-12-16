@@ -23,6 +23,17 @@ pattern ОбстДляДееприч0
  ГруппаНареч2 { ~НеМожетМодифГлаг } : export { node:root_node }
 }
 
+
+// спросил я, удивившись еще более.
+//                       ^^^^^^^^^
+pattern ОбстДляДееприч0
+{
+ ГруппаНареч2 { НеМожетМодифГлаг } : export { node:root_node }
+}
+: ngrams { -3 }
+
+
+
 pattern ОбстДляДееприч0
 {
  НаречДляДеепр : export { node:root_node }
@@ -330,6 +341,16 @@ pattern Деепр0
 : ngrams { -1 }
 
 
+// Юноши, и умирая, пели.
+//        ^^^^^^^^
+pattern Деепр0
+{
+ p=частица:и{}
+ a=Деепр0 : export { node:root_node ПЕРЕХОДНОСТЬ ПАДЕЖ МОДАЛЬНЫЙ }
+}
+: links { A.<PREFIX_PARTICLE>p }
+: ngrams { -1 }
+
 
 // Дефолтное правило - разрешаем прикреплять к деепричастию
 // любые частицы с большим штрафом.
@@ -351,7 +372,7 @@ pattern Деепр
 {
  a=Деепр0{ ПритворитьсяТакимтоГл } : export { node:root_node }
  obj=ГруппаПрил2{ ПАДЕЖ:ТВОР }
-} : links { a.<RIGHT_INSTR_OBJECT>obj }
+} : links { a.<OBJECT>obj }
 : ngrams
 {
  ВалентностьГлагола(a)
@@ -376,7 +397,7 @@ pattern Деепр
 {
  a=Деепр0 : export { node:root_node }
  obj=ПорядкЧислКакОбст
-} : links { a.<RIGHT_INSTR_OBJECT>obj }
+} : links { a.<OBJECT>obj }
 
 
 // закончив работу третьей, она спокойно пошла домой
@@ -389,7 +410,7 @@ pattern Деепр
 {
  a.{
     <OBJECT>obj1
-    <RIGHT_INSTR_OBJECT>obj2
+    <OBJECT>obj2
    }
 }
 : ngrams
@@ -431,7 +452,7 @@ pattern Деепр
 {
  A.{
     ~<ATTRIBUTE>adv
-    <RIGHT_INSTR_OBJECT>adj
+    <OBJECT>adj
    }
 }
 : ngrams

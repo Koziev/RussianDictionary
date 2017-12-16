@@ -823,6 +823,15 @@ pattern ИнфВосх
 }
 
 
+// Висящий одиночный предлог
+pattern ИнфВосх
+{
+ v=ИнфВосх : export { node:root_node ПЕРЕХОДНОСТЬ ПАДЕЖ ВИД МОДАЛЬНЫЙ }
+ p=предлог:*{}
+} : links { v.<ATTRIBUTE>p }
+: ngrams { -6 }
+
+
 
 pattern ИнфВосх
 {

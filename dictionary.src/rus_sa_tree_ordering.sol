@@ -13,7 +13,7 @@ tree_scorer language=Russian
 
 tree_scorer ВалентностьГлагола language=Russian
 {
- if context { глагол:v{1}.наречие:*{2} }
+ if context { глагол:v{1}.наречие:*{ 2 СТЕПЕНЬ:АТРИБ } }
   then -2
 }
 #end
@@ -114,19 +114,19 @@ wordentry_set НаречиеКак=наречие:{
 tree_scorer ВалентностьГлагола language=Russian generic
 {
  if context { безлич_глагол:*{1}.НаречиеКак{2}.[not]*:*{} }
-  then -10
+  then -8
 }
 
 tree_scorer ВалентностьГлагола language=Russian generic
 {
  if context { глагол:*{1}.НаречиеКак{2}.[not]*:*{} }
-  then -10
+  then -8
 }
 
 tree_scorer ВалентностьГлагола language=Russian generic
 {
  if context { инфинитив:*{1}.НаречиеКак{2}.[not]*:*{} }
-  then -10
+  then -8
 }
 
 tree_scorer ВалентностьГлагола language=Russian generic

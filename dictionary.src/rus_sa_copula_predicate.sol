@@ -3,6 +3,7 @@
 // ***********************
 
 
+
 // ----------------------------------
 
 // кот БЫЛ котенком
@@ -70,6 +71,25 @@ pattern Связка
     <POSTFIX_PARTICLE>p
    }
 }
+
+
+// Я есть Грут.
+//   ^^^^
+pattern Связка
+{
+ 'есть'{ ВРЕМЯ:НАСТОЯЩЕЕ } : export { РОД ЧИСЛО ЛИЦО ВРЕМЯ node:root_node }
+}
+
+
+// Ведь ты и есть мечта Оливии.
+//         ^^^^^^
+pattern Связка
+{
+ p=частица:и{}
+ v='есть'{ ВРЕМЯ:НАСТОЯЩЕЕ } : export { РОД ЧИСЛО ЛИЦО ВРЕМЯ node:root_node }
+}
+: links { v.<PREFIX_PARTICLE>p }
+: ngrams { -1 }
 
 
 
@@ -140,7 +160,7 @@ patterns СвязкаСказВосх { bottomup  } export { node:root_node ЛИ
 pattern СвязкаСказВосх
 {
  Связка : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY:1 RHEMA_VALENCY:1 }
-} : ngrams { -1 } // штраф за отсутствие темы
+}
 
 
 /*
@@ -221,6 +241,30 @@ pattern СвязкаСказВосх
 
 
 
+// В комнате больше никого не было.
+//           ^^^^^^ ~~~~~~
+wordentry_set НеПрисоедКомпаратив=
+{
+ местоим_сущ:ничто{},
+ местоим_сущ:нечто{}, // Здесь нам делать больше нечего.
+ местоим_сущ:некто{},
+ местоим_сущ:никто{}
+}
+
+// Компаратив прилагательного в роли именного сказуемого со связочным глаголом:
+//
+// купол выглядел темнее стен
+//                ^^^^^^ ^^^^
+pattern СвязкаСказВосх
+{
+ v=СвязкаСказВосх{ RHEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY:0 }
+ adj=ГруппаСравнПрил{ /*~ИсклСравнПрил*/ }
+ obj=РодДополнение{ ~НеПрисоедКомпаратив }
+}
+: links { v.<RHEMA>adj.<OBJECT>obj }
+
+
+
 
 // Она была ласковая и заботливая
 pattern СвязкаСказВосх
@@ -254,9 +298,13 @@ pattern СвязкаСказВосх
 pattern СвязкаСказВосх
 {
  v=СвязкаСказВосх{ RHEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY:0 }
- rhema=ГруппаСущ4{ ПАДЕЖ:ИМ ОДУШ:ОДУШ =v:ЧИСЛО =v:РОД }
+ rhema=ГруппаСущ4{ ПАДЕЖ:ИМ [-1]ОДУШ:ОДУШ =v:ЧИСЛО =v:РОД }
 }
 : links { v.<RHEMA>rhema }
+
+
+
+
 
 // Это была она
 pattern СвязкаСказВосх
@@ -302,6 +350,7 @@ pattern КтоПодлеж2
 } : links { n.~<POSTFIX_PARTICLE>p }
 
 // она была кто?
+//     ^^^^^^^^
 pattern СвязкаСказВосх
 {
  v=СвязкаСказВосх{ RHEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY:0 }
@@ -310,6 +359,15 @@ pattern СвязкаСказВосх
 : links { v.<RHEMA>rhema }
 : ngrams { -1 }
 
+// Без тебя я была никто.
+//            ^^^^^^^^^^
+pattern СвязкаСказВосх
+{
+ v=СвязкаСказВосх{ RHEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY:0 RHEMA_VALENCY }
+ sbj=местоим_сущ{ ПАДЕЖ:ИМ }
+}
+: links { v.<RHEMA>sbj }
+: ngrams { -2 }
 
 
 // Тут был он
@@ -323,15 +381,6 @@ pattern СвязкаСказВосх
 
 
 
-wordentry_set Наречия_Лишь = {
- наречие:лишь{},
- наречие:только{},
- наречие:всего{},
- наречие:всего лишь{},
- наречие:только лишь{},
- наречие:только-только{},
- наречие:уже{}
-}
 
 patterns ВремяКакПодлежащее export { node:root_node }
 pattern ВремяКакПодлежащее
@@ -346,7 +395,7 @@ pattern ВремяКакПодлежащее
 // Теперь было лишь три часа ночи
 pattern СвязкаСказВосх
 {
- v=СвязкаСказВосх{ /*ВРЕМЯ:ПРОШЕДШЕЕ*/ ЧИСЛО:ЕД РОД:СР THEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY:0 RHEMA_VALENCY:0 }
+ v=СвязкаСказВосх{ ЧИСЛО:ЕД РОД:СР THEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY:0 RHEMA_VALENCY:0 }
  sbj=ВремяКакПодлежащее
 }
 : links { v.<RHEMA>sbj }
@@ -358,12 +407,19 @@ pattern СвязкаСказВосх
 
 patterns СвязкаСказНисх export { node:root_node ЛИЦО ЧИСЛО РОД THEMA_VALENCY RHEMA_VALENCY }
 
+// Если валентность подлежащего (темы) осталась незаполненной,
+// то наложим небольшой штраф.
 pattern СвязкаСказНисх
 {
- СвязкаСказВосх : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY }
+ СвязкаСказВосх{ THEMA_VALENCY:1 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY }
+} : ngrams { -1 }
+
+
+// Какой же будет ее цена?
+pattern СвязкаСказНисх
+{
+ СвязкаСказВосх{ THEMA_VALENCY:0 } : export { node:root_node РОД ЛИЦО ЧИСЛО THEMA_VALENCY RHEMA_VALENCY }
 }
-
-
 
 
 
@@ -556,9 +612,7 @@ pattern ПредикатСвязка
  ВалентностьГлагола(v)
 }
 
-
-
-
+/*
 // Редкий случай - связка настоящего времени, в качестве
 // которой выступает форма 'ЕСТЬ':
 //
@@ -582,7 +636,7 @@ pattern ПредикатСвязка
 {
  adv_verb_score(adv1,v)
 }
-
+*/
 
 
 

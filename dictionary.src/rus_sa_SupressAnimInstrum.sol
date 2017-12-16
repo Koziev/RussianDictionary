@@ -1,4 +1,20 @@
-﻿// подавляем заполнение одушевленным дополнением слота для творительного падежа
+﻿/*
+ подавляем заполнение одушевленным дополнением слота для творительного падежа
+
+ запрос для получения списка глаголов с творительной валентностью:
+
+ select 'SupressAnimInstrum(' + E.name + ')'
+  from sg_class CL
+  join SG_entry E on E.id_class=CL.id and E.name not like '%ся'
+  left join omonym O on O.entry_name=E.name
+  join sg_entry_coord EC on EC.id_entry=E.id
+  join sg_coord C on C.id=EC.icoord and C.name='ПАДЕЖ'
+  join sg_state S on S.id=EC.istate and S.id_coord=C.id and S.name='ТВОР'
+  where CL.name='ИНФИНИТИВ'
+        and O.id is null       
+       
+*/
+
 
 
 tree_scorers ОдушОбъектТвор
@@ -82,7 +98,6 @@ SupressAnimInstrum( расчленять )
 SupressAnimInstrum( решать )
 SupressAnimInstrum( срывать )
 SupressAnimInstrum( уведомлять )
-SupressAnimInstrum( угощать )
 SupressAnimInstrum( удушать )
 SupressAnimInstrum( скруглять )
 SupressAnimInstrum( расцвечивать )

@@ -627,7 +627,7 @@ pattern СоюзКакВводн
 pattern СоюзКакВводн
 {
  p=частица:это{} : export { node:root_node }
-} : ngrams { -5 }
+} : ngrams { -2 }
 
 
 // Ну а если взять предельный радиус действий самолетов?
@@ -707,7 +707,16 @@ pattern СодержаниеРечи
 } : links { s.~<PUNCTUATION>end }
 
 
-word_set РазделительРечи = { '-', '–', '—' }
+patterns РазделительРечи export { node:root_node }
+
+// - А дети-инвалиды находятся под надзором.
+//        ~~~~
+pattern РазделительРечи { '-'{ ~tokenizer_flag:word_conjunction }: export { node:root_node } }
+pattern РазделительРечи { '–'{ ~tokenizer_flag:word_conjunction }: export { node:root_node } }
+
+// — Я работаю, - сказал Вячеслав Викторович.
+// ^
+pattern РазделительРечи { '—'{ ~tokenizer_flag:word_conjunction }: export { node:root_node } }
 
 
 // - А где ж твой отец-то?
@@ -882,6 +891,24 @@ pattern Предлож1
 }
 
 
+// Кутить так кутить.
+pattern Предлож1
+{
+ v1=инфинитив:*{} : export { node:root_node }
+ conj=Союз:так{}
+ v2=инфинитив:*{}
+} : links { v1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2 }
+
+
+// Завивает так завивает!
+pattern Предлож1
+{
+ v1=глагол:*{} : export { node:root_node }
+ conj=Союз:так{}
+ v2=глагол:*{}
+} : links { v1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2 }
+
+
 
 
 // Предложения, начинающиеся с сочинительного союза:
@@ -920,6 +947,13 @@ pattern КонецПредл
 {
  КонецПредлТокен : export { node:root_node }
 }
+
+// Ближайшее полное затмение москвичи увидят..
+pattern КонецПредл
+{
+ a=КонецПредлТокен
+ b=КонецПредл : export { node:root_node }
+} : links { b.<PUNCTUATION>a }
 
 
 // ты собираешься платить или как?
@@ -1019,6 +1053,50 @@ pattern КонецПредл
       ~<SENTENCE_CLOSER>t
 }
 
+
+// незавершенное предложение:
+// К ним тянутся вереницы паломников и...
+//                                   ^^^^
+// Контрпример:
+// Себя любить принудила ты чем?
+//                          ~~~~
+pattern КонецПредл
+{
+ w1=союз:*{} : export { node:root_node }
+ t=@optional(КонецПредлТокен)
+ @noshift(BETH:END{})
+}
+: links { w1.~<SENTENCE_CLOSER>t }
+: ngrams { -10 }
+
+
+// Я оскорбил ее окончательно, но...
+// 
+pattern КонецПредл
+{
+ comma=','
+ w1=союз:*{} : export { node:root_node }
+ t=@optional(КонецПредлТокен)
+ @noshift(BETH:END{})
+}
+: links { w1.{ <PUNCTUATION>comma ~<SENTENCE_CLOSER>t } }
+: ngrams { -6 }
+
+
+
+// незавершенное предложение:
+// А как вы проводили выходные в...
+//                             ^^^^
+pattern КонецПредл
+{
+ w1=предлог:*{} : export { node:root_node }
+ t=@optional(КонецПредлТокен)
+ @noshift(BETH:END{})
+} : links { w1.~<SENTENCE_CLOSER>t }
+: ngrams { -7 }
+
+
+
 // --------------------------------
 
 
@@ -1027,6 +1105,23 @@ pattern ПредложСТерм
  s=Предлож1 : export { node:root_node }
  fin=@optional(КонецПредл)
 } : links { s.~<PUNCTUATION>fin }
+
+
+// "Идите!"
+pattern ПредложСТерм
+{
+ a1=ОткрКавычк
+ s=Предлож1 : export { node:root_node }
+ fin=@optional(КонецПредл)
+ a2=ЗакрКавычк
+} : links
+{
+ s.{
+    <PUNCTUATION>a1
+    ~<PUNCTUATION>fin
+    <PUNCTUATION>a2
+   }
+}
 
 
 // Союзы НО, ХОТЯ, А могут выступать в роли вводных для полного предложения:
@@ -1095,8 +1190,19 @@ pattern ПредложСТерм
     ~<PUNCTUATION>fin
    }
 }
+// некоторые союзы омонимичны наречиям, поэтому предпочитаем наречия:
+// Поэтому метафорами стали заниматься профессионально.
+// ^^^^^^^
+: ngrams { -1 }
 
 
+// - А дети-инвалиды участвуют?
+// ^
+pattern ПредложСТерм
+{
+ intro='-'
+ s=ПредложСТерм : export { node:root_node }
+} : links { s.<PUNCTUATION>intro }
 
 
 pattern ПредложСТерм
@@ -1130,6 +1236,13 @@ pattern ГруппаПрилНазв
  прилагательное:* { ~КРАТКИЙ СТЕПЕНЬ:АТРИБ ПАДЕЖ:ИМ } :export { node:root_node РОД ЧИСЛО ОДУШ }
 }
 
+// сыр вкуснейший
+pattern ГруппаПрилНазв
+{
+ прилагательное:* { ~КРАТКИЙ СТЕПЕНЬ:ПРЕВОСХ ПАДЕЖ:ИМ } :export { node:root_node РОД ЧИСЛО ОДУШ }
+}
+
+
 pattern ГруппаПрилНазв
 {
  a1=прилагательное:* { ~КРАТКИЙ СТЕПЕНЬ:АТРИБ ПАДЕЖ:ИМ } :export { node:root_node РОД ЧИСЛО ОДУШ }
@@ -1140,10 +1253,17 @@ pattern ГруппаПрилНазв
 
 pattern НаучнНазв
 {
- n=существительное:*{ число:ед падеж:им } : export { node:root_node }
- a=ГруппаПрилНазв{ =n:РОД число:ед }
+ n=существительное:*{ падеж:им } : export { node:root_node }
+ a=ГруппаПрилНазв{ =n:РОД =n:ЧИСЛО }
 } : links { n.<ATTRIBUTE>a }
 
+// Мороженое не плохое
+pattern НаучнНазв
+{
+ n=существительное:*{ падеж:им } : export { node:root_node }
+ neg=частица:не{}
+ a=ГруппаПрилНазв{ =n:РОД =n:ЧИСЛО }
+} : links { n.<ATTRIBUTE>a.<NEGATION_PARTICLE>neg }
 
 
 // ******************************

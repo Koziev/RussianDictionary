@@ -16,6 +16,62 @@
 
 patterns ФИО_Имя0 { language=Russian } export { node:root_node ПАДЕЖ РОД }
 
+
+function int IsRuFirstName( tree w )
+{
+ // Если имя известно системе как существительное, входящее в класс "имён":
+ //
+ // Отдай его Алисе Селезнёвой!
+ //           ^^^^^
+ tuple tx = thesaurus_collect( w, <в_класс> );
+
+ if( gt( tuple_count(tx), 0 ) )
+  then
+  { 
+   int n=tuple_count(tx);
+   int i;
+   for i=0 to arith_minus(n,1)
+   {
+    tree w2 = tuple_get( tx, i );
+    int ie = wordform_entry(w2);
+    string ename = entry_name(ie);
+	if( eq( ie, wordform_entry( СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} ) ) )
+	 then return 0;
+   }
+  }
+ 
+ // Предпочитаем существительные в единственном числе
+ // Янура ответила слабой улыбкой.
+ // ^^^^^
+ int id_pos =  wordform_class(w);
+ if( eq( id_pos, СУЩЕСТВИТЕЛЬНОЕ ) )
+  then
+  {
+   int numb_state = wordform_get_coord(w,ЧИСЛО);
+   if( eq( numb_state, ЧИСЛО:ЕД ) )
+    then
+    {
+     // Если существительное не зарегистрировано как имя,
+     // то это должно быть существительное ???, то есть несловарное.
+	 int id_entry = wordform_entry(w);
+	 if( eq( id_entry, wordform_entry(СУЩЕСТВИТЕЛЬНОЕ:???{}) ) )
+	  then return 0;
+	  else return -3;
+	}
+    else return -4;
+  }
+  
+  
+ return -6;
+}
+
+
+pattern ФИО_Имя0
+{
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+"){ IsRuFirstName(_) } : export { node:root_node ПАДЕЖ РОД }
+}
+
+/*
 // Если имя известно системе как существительное, входящее в класс "имён":
 //
 // Отдай его Алисе Селезнёвой!
@@ -23,7 +79,7 @@ patterns ФИО_Имя0 { language=Russian } export { node:root_node ПАДЕЖ 
 pattern ФИО_Имя0
 {
  существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} CHARCASING:FirstCapitalized }:export { node:root_node ПАДЕЖ РОД }
-} : ngrams { 2 }
+} : ngrams { 1 }
 
 
 // -----------------------------------------------------------------------------
@@ -35,14 +91,14 @@ pattern ФИО_Имя0
 // ^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН [-1]ЧИСЛО:ЕД } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -5 }
 
 // Калинов осторожно обнял жену.
 // ^^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ [-1]ЧИСЛО:ЕД } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -5 }
 
 
@@ -53,14 +109,14 @@ pattern ФИО_Имя0
 // ^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[аои]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:МУЖ [-1]ЧИСЛО:ЕД } : export { РОД:МУЖ ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -6 }
 
 // Джудиет рассматривала платье.
 // ^^^^^^^
 pattern ФИО_Имя0
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+[\\@бьй]"){ [-1]ПАДЕЖ:ИМ [-1]РОД:ЖЕН [-1]ЧИСЛО:ЕД } : export { РОД:ЖЕН ПАДЕЖ:ИМ node:root_node }
 } : ngrams { -6 }
 
 
@@ -70,6 +126,7 @@ pattern ФИО_Имя0 export { node:root_node ПАДЕЖ (РОД) }
 {
  @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+"):export { node:root_node ПАДЕЖ }
 } : ngrams { -6 }
+*/
 
 // ---------------------------------------------------
 
@@ -113,15 +170,83 @@ pattern ФИО_Имя
 
 // -----------------------------------------------
 
-patterns ФИО_Фамилия { language=Russian } export { node:root_node ПАДЕЖ }
+patterns ФИО_Фамилия { language=Russian } export { node:root_node ПАДЕЖ РОД }
 
 // Если слово занесено в лексикон как "существительное" и в тезаурус как "фамилия":
 //
+
+function int IsRuLastName( tree w )
+{
+ // Запрещаем некоторые прилагательные в роли имен:
+ // Сам Давид показал девятнадцатый результат
+ // ~~~
+ int ie0 = wordform_entry(w);
+ if( eq( ie0, wordform_entry( ПРИЛАГАТЕЛЬНОЕ:САМ{} ) ) )
+  then return -20;    
+    
+ // Дмитрий Константинов принял присягу
+ //         ^^^^^^^^^^^^
+ tuple tx = thesaurus_collect( w, <в_класс> );
+
+ if( gt( tuple_count(tx), 0 ) )
+  then
+  { 
+   int n=tuple_count(tx);
+   int i;
+   for i=0 to arith_minus(n,1)
+   {
+    tree w2 = tuple_get( tx, i );
+    int ie = wordform_entry(w2);
+    string ename = entry_name(ie);
+	if( eq( ie, wordform_entry( СУЩЕСТВИТЕЛЬНОЕ:ФАМИЛИЯ{} ) ) )
+	 then return 0;
+   }
+  }
+ 
+ // Предпочитаем существительные в единственном числе
+ // Встретил Алексея Ворона
+ //                  ^^^^^^
+ int id_pos =  wordform_class(w);
+ if( eq( id_pos, СУЩЕСТВИТЕЛЬНОЕ ) )
+  then
+  {
+   int numb_state = wordform_get_coord(w,ЧИСЛО);
+   if( eq( numb_state, ЧИСЛО:ЕД ) )
+    then
+    {
+     // Если существительное не зарегистрировано как имя,
+     // то это должно быть существительное ???, то есть несловарное.
+	 int id_entry = wordform_entry(w);
+  	 if( eq( id_entry, wordform_entry(СУЩЕСТВИТЕЛЬНОЕ:???{}) ) )
+	  then return 0;
+	  else return -3;
+    }
+    else return -4;
+  }
+  
+ // Может быть прилагательное 
+ // Поговорите с Алексеем Ничипоренковым
+ //                       ^^^^^^^^^^^^^^
+ if( eq( id_pos, ПРИЛАГАТЕЛЬНОЕ ) )
+  then
+  {
+   int numb_state = wordform_get_coord(w,ЧИСЛО);
+   if( eq( numb_state, ЧИСЛО:ЕД ) )
+    then return -1;
+    else return -4;
+  }	  
+  
+ return -6;
+}
+
+
+
+/*
 // Дмитрий Константинов принял присягу
 //         ^^^^^^^^^^^^
 pattern ФИО_Фамилия
 {
- существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ФАМИЛИЯ{} CHARCASING:FirstCapitalized }:export { node:root_node ПАДЕЖ }
+ существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ФАМИЛИЯ{} CHARCASING:FirstCapitalized }:export { node:root_node ПАДЕЖ РОД }
 } : ngrams { 1 }
 
 
@@ -129,14 +254,14 @@ pattern ФИО_Фамилия
 //                  ^^^^^^
 pattern ФИО_Фамилия
 {
- существительное:*{ CharCasing:FirstCapitalized } : export { node:root_node ПАДЕЖ }
+ существительное:*{ CharCasing:FirstCapitalized } : export { node:root_node ПАДЕЖ РОД }
 }
 
 // Поговорите с Алексеем Ничипоренковым
 //                       ^^^^^^^^^^^^^^
 pattern ФИО_Фамилия
 {
- прилагательное:*{ CharCasing:FirstCapitalized } : export { node:root_node ПАДЕЖ }
+ прилагательное:*{ CharCasing:FirstCapitalized } : export { node:root_node ПАДЕЖ РОД }
 }
 
 
@@ -144,22 +269,52 @@ pattern ФИО_Фамилия
 //        ^^^^^^^^^
 pattern ФИО_Фамилия
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node ПАДЕЖ }
+ @and(
+      @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node ПАДЕЖ РОД },
+	  существительное:*{}
+	 ) 
+} : ngrams { -3 }
+
+
+
+pattern ФИО_Фамилия
+{
+ @and(
+      @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node ПАДЕЖ РОД },
+	  unknownentries:*{}
+	 ) 
 } : ngrams { -2 }
+
+
+pattern ФИО_Фамилия
+{
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { node:root_node ПАДЕЖ РОД }
+} : ngrams { -5 }
+*/
+
+
+// Джордж Вашингтон был первым президентом США
+//        ^^^^^^^^^
+pattern ФИО_Фамилия
+{
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+"){ IsRuLastName(_) } : export { node:root_node ПАДЕЖ РОД }
+}
+
+
 
 
 // ---------------------------------------------------
 
-patterns ФИО_Отчество { language=Russian } export { node:root_node ПАДЕЖ }
+patterns ФИО_Отчество { language=Russian } export { node:root_node ПАДЕЖ РОД }
 
 pattern ФИО_Отчество
 {
- существительное:*{ CharCasing:FirstCapitalized ОДУШ:ОДУШ } : export { node:root_node ПАДЕЖ }
+ существительное:*{ CharCasing:FirstCapitalized ОДУШ:ОДУШ } : export { node:root_node ПАДЕЖ РОД }
 } : ngrams { 1 }
 
 pattern ФИО_Отчество
 {
- @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { ПАДЕЖ node:root_node }
+ @regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+") : export { ПАДЕЖ РОД node:root_node }
 } : ngrams { -1 }
 
 
@@ -181,29 +336,6 @@ pattern ФИО
  @regex_strict("[\\@А\\@Б]\\.[\\@А\\@БЙ][\\@а\\@б\\@й]+"):export { node:root_node ПАДЕЖ РОД }
 }
 
-/*
-// Михаил Сергеевич Горбачов был президентом СССР
-// ^^^^^^^^^^^^^^^^^^^^^^^^^
-pattern ФИО
-{
- n1=ФИО_Имя : export { node:root_node ПАДЕЖ }
- n2=@regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+")
- n3=@regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+")
-} : links { n1.<RIGHT_NAME>n2.<RIGHT_NAME>n3 }
-*/
-
-
-/*
- // Джордж Вашингтон был первым президентом США
- // ^^^^^^^^^^^^^^^^
- pattern ФИО
- {
-  n1=ФИО_Имя : export { node:root_node ПАДЕЖ }
-  n2=@regex_strict("[\\@А\\@БЙ][\\@а\\@б\\@й]+")
- }
- : links { n1.<RIGHT_NAME>n2 }
- : ngrams { -1 }
-*/
 
 // Валерий Иванов сдал экзамены
 // ^^^^^^^^^^^^^^
@@ -212,17 +344,41 @@ pattern ФИО
 pattern ФИО
 {
  n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
- n2=ФИО_Фамилия{ [-1]=n1:ПАДЕЖ }
+ n2=ФИО_Фамилия{ [-1]=n1:ПАДЕЖ [-1]=n1:РОД }
 }
 : links { n1.<RIGHT_NAME>n2 }
 : ngrams { 1 }
+
+
+// Имена с римскими цифрами - цари и т.д.:
+// Александр II отыскал меня и спросил:
+// ^^^^^^^^^^^^
+pattern ФИО
+{
+ n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
+ n2=@regex_strict("[IVXML]+")
+}
+: links { n1.<RIGHT_NAME>n2 }
+: ngrams { 1 }
+
+
+// В разгаре переговоров Людовик XV скончался.
+//                       ^^^^^^^^^^
+pattern ФИО
+{
+ n1 = существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} CHARCASING:FirstCapitalized }:export { node:root_node ПАДЕЖ РОД }
+ n2=@regex_strict("[IVXML]+")
+}
+: links { n1.<RIGHT_NAME>n2 }
+: ngrams { 2 }
+
 
 // Позже позвонил мне Беляков Михаил.
 //                    ^^^^^^^^^^^^^^
 pattern ФИО
 {
  n2=ФИО_Фамилия{}
- n1=существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} CHARCASING:FirstCapitalized [-1]=n2:ПАДЕЖ } : export { node:root_node ПАДЕЖ РОД }
+ n1=существительное:*{ ОДУШ:ОДУШ <в_класс>СУЩЕСТВИТЕЛЬНОЕ:ИМЯ{} CHARCASING:FirstCapitalized [-2]=n2:ПАДЕЖ } : export { node:root_node ПАДЕЖ РОД }
 }
 : links { n1.<RIGHT_NAME>n2 }
 : ngrams { 1 }
@@ -240,10 +396,12 @@ pattern ФИО
 
 // Михаил Сергеевич был президентом СССР
 // ^^^^^^^^^^^^^^^^
+// Бизнесменом года стал Эдуард Бибер.
+//                       ^^^^^^^^^^^^
 pattern ФИО
 {
  n1=ФИО_Имя : export { node:root_node ПАДЕЖ РОД }
- n3=ФИО_Отчество{ [-1]=n1:ПАДЕЖ }
+ n3=ФИО_Отчество{ [-1]=n1:ПАДЕЖ [-1]=n1:РОД }
 } : links { n1.<RIGHT_NAME>n3 }
 
 
@@ -309,10 +467,20 @@ pattern СущСРодДоп
 pattern СущСРодДоп
 {
  n1=ГруппаСущ1{ одуш:одуш число:ед }:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- n2=ФИО_Имя
+ n2=ФИО{ [-2]=n1:ПАДЕЖ [-2]=n1:РОД } //ФИО_Имя
 }
-: ngrams { -2 }
+: ngrams { -1 }
 : links { n1.<RIGHT_NAME>n2 }
+
+// Строптивого Уолтера Хьюлетта выкинули из совета директоров объединенной компании.
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pattern СущСРодДоп
+{
+ a=ГруппаПрил2{ ЧИСЛО:ЕД }
+ n=ФИО{ [-2]=a:ПАДЕЖ [-2]=a:РОД }:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+}
+: links { n.<ATTRIBUTE>a }
+
 
 // ------------------------------------
 

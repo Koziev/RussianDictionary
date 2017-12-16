@@ -15,10 +15,12 @@ tree_scorer ОдушОбъектРод language=Russian
 
 #define SupressAnimGen(v) \
 #begin
+// Контрпример:
+// Нагоняю двух связистов.
 tree_scorer language=Russian
 {
  if context { rus_verbs:v{}.{
-                             <OBJECT>ОдушОбъектРод
+                             <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                              [not]частица:не{}
                             } }
   then -100
@@ -27,7 +29,7 @@ tree_scorer language=Russian
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { rus_verbs:v{}.{
-                             <OBJECT>ОдушОбъектРод
+                             <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                              [not]частица:не{}
                             } }
   then -100
@@ -39,7 +41,7 @@ tree_scorer ВалентностьГлагола language=Russian
 tree_scorer language=Russian
 {
  if context { инфинитив:v{ вид:соверш }.{
-                                         <OBJECT>ОдушОбъектРод
+                                         <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                          [not]частица:не{}
                                         } }
   then -100
@@ -48,7 +50,7 @@ tree_scorer language=Russian
 tree_scorer language=Russian
 {
  if context { инфинитив:v{ вид:несоверш }.{
-                                           <OBJECT>ОдушОбъектРод
+                                           <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                            [not]частица:не{}
                                           } }
   then -100
@@ -57,7 +59,7 @@ tree_scorer language=Russian
 tree_scorer language=Russian
 {
  if context { глагол:v{ вид:соверш }.{
-                                      <OBJECT>ОдушОбъектРод
+                                      <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                       [not]частица:не{}
                                      } }
   then -100
@@ -66,7 +68,7 @@ tree_scorer language=Russian
 tree_scorer language=Russian
 {
  if context { глагол:v{ вид:несоверш }.{
-                                        <OBJECT>ОдушОбъектРод
+                                        <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                         [not]частица:не{}
                                        } }
   then -100
@@ -78,7 +80,7 @@ tree_scorer language=Russian
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { инфинитив:v{ вид:соверш }.{
-                                         <OBJECT>ОдушОбъектРод
+                                         <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                          [not]частица:не{}
                                         } }
   then -100
@@ -87,7 +89,7 @@ tree_scorer ВалентностьГлагола language=Russian
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { инфинитив:v{ вид:несоверш }.{
-                                           <OBJECT>ОдушОбъектРод
+                                           <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                            [not]частица:не{}
                                           } }
   then -100
@@ -96,7 +98,7 @@ tree_scorer ВалентностьГлагола language=Russian
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { глагол:v{ вид:соверш }.{
-                                      <OBJECT>ОдушОбъектРод
+                                      <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                       [not]частица:не{}
                                      } }
   then -100
@@ -105,7 +107,7 @@ tree_scorer ВалентностьГлагола language=Russian
 tree_scorer ВалентностьГлагола language=Russian
 {
  if context { глагол:v{ вид:несоверш }.{
-                                        <OBJECT>ОдушОбъектРод
+                                        <OBJECT>ОдушОбъектРод.[not]числительное:*{}
                                         [not]частица:не{}
                                        } }
   then -100

@@ -13,8 +13,20 @@ patterns ТемаВосх { bottomup } export { node:root_node }
 
 pattern ТемаВосх
 {
- ГлДополнение{ ПАДЕЖ:ИМ } : export { node:root_node }
+ ГлДополнение{ [-2]ПАДЕЖ:ИМ } : export { node:root_node }
 }
+
+
+// В этом-то и дело.
+//           ^^^^^^
+pattern ТемаВосх
+{
+ p=частица:и{}
+ n=ГруппаСущ4{ ПАДЕЖ:ИМ } : export { node:root_node }
+}
+: ngrams { -2 }
+: links { n.<PREFIX_PARTICLE>p }
+
 
 
 // -----------------------
@@ -40,16 +52,6 @@ pattern ТемаВосх
  p=ЧтоТема : export { node:root_node }
  a=прилагательное:такой{ падеж:им число:ед род:ср }
 } : links { p.<ATTRIBUTE>a }
-
-// ---------------------
-
-/*
-pattern ТемаВосх
-{
- p=частица:не{}
- n=ГлДополнение{ ПАДЕЖ:ИМ } : export { node:root_node }
-} : links { n.<NEGATION_PARTICLE>p }
-*/
 
 // ------------------------
 
@@ -184,6 +186,20 @@ pattern ПредикатСвязка
 }
 : ngrams
 {
- -5 // -10
+ -5
  ВалентностьНульСвязки(p)
+}
+
+
+// Ванную огромная
+pattern ПредикатСвязка
+{
+ sbj=ГлДополнение{ [-2]ПАДЕЖ:ИМ } : export { node:root_node }
+ attr=ГруппаПрил2{ [-2]ПАДЕЖ:ИМ =sbj:РОД =sbj:ЧИСЛО }
+}
+: links { sbj.<ATTRIBUTE>attr }
+: ngrams
+{
+ -7
+ ВалентностьНульСвязки(sbj)
 }

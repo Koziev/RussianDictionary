@@ -3,26 +3,27 @@
 
 // +++++++++++++++++++++++++++++++++++++++++++++
 
-patterns ЛогичЭлементСущ export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+patterns ГоловаГруппыСущ export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
-pattern ЛогичЭлементСущ
+pattern ГоловаГруппыСущ
 {
- n=СущОбращение:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ СущОбращение : export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
 
-pattern ЛогичЭлементСущ
+
+pattern ГоловаГруппыСущ
 {
- n=СущСПредложДоп:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ СущСПредложДоп : export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
 
 // одно кофе и один бутерброд с сыром 
-pattern ЛогичЭлементСущ
+pattern ГоловаГруппыСущ
 {
  ЧислСущ:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
 
 // нож с пилой, разрезающий гвозди
-pattern ЛогичЭлементСущ
+pattern ГоловаГруппыСущ
 {
  СущСПричОборотом:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
@@ -30,48 +31,82 @@ pattern ЛогичЭлементСущ
 // Локатив и предложный могут смешиваться в союзном паттерне:
 // На лбу и щеке.
 // На лбу, носу и щеке проступало черное пятно кровоподтека.
-pattern ЛогичЭлементСущ
+pattern ГоловаГруппыСущ
 {
- n=СущСПредложДоп{ ПАДЕЖ:МЕСТ }:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ:ПРЕДЛ ЧИСЛО ОДУШ node:root_node }
+ СущСПредложДоп{ ПАДЕЖ:МЕСТ }:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ:ПРЕДЛ ЧИСЛО ОДУШ node:root_node }
 }
 
 // Это сделал не он, а его помощник
 //               ^^
-pattern ЛогичЭлементСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+pattern ГоловаГруппыСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО (ОДУШ) node:root_node }
 {
- n=ГруппаМест:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ ГруппаМест:export{ РОД ПАДЕЖ ЧИСЛО node:root_node }
 }
 
 
 // к себе и другим
 //   ^^^^
-pattern ЛогичЭлементСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+pattern ГоловаГруппыСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 {
- n=местоим_сущ:себя{} : export { РОД ПАДЕЖ ЧИСЛО ОДУШ:ОДУШ node:root_node }
+ местоим_сущ:себя{} : export { РОД ПАДЕЖ ЧИСЛО ОДУШ:ОДУШ node:root_node }
 }
 
 // к себе и другим
 //          ^^^^^^
-pattern ЛогичЭлементСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+pattern ГоловаГруппыСущ export { (KEYFEATURE_REQUIRED) РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 {
- n=ГруппаПрил1 : export { РОД ПАДЕЖ ЧИСЛО ОДУШ:ОДУШ node:root_node }
+ ГруппаПрил1 : export { РОД ПАДЕЖ ЧИСЛО ОДУШ:ОДУШ node:root_node }
 } : ngrams { -9 }
 
 
 // ---------------------------------------------------------
 
-patterns ГруппаСущВосх { bottomup } export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+patterns ХвостГруппыСущ export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 
-pattern ГруппаСущВосх
+wordentry_set НеЭлементСоюзнГруппы=
 {
- ЛогичЭлементСущ:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ местоим_сущ:что{}, // Рехнулись они, что ли?
+ местоим_сущ:кто{},
+ местоим_сущ:никто{},
+ местоим_сущ:ничто{}
+}
+
+pattern ХвостГруппыСущ
+{
+ ГоловаГруппыСущ{ ~НеЭлементСоюзнГруппы }:export{ KEYFEATURE_REQUIRED:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+}
+
+
+// ---------------------------------------------------------
+
+
+
+
+// ---------------------------------------------------------
+
+// признак KEYFEATURE_REQUIRED:0 - в группу вошло хотя бы одно существительное
+// признак KEYFEATURE_DESIRABLE:1 - в группу вошел хотя бы один союз
+
+patterns ГруппаСущВосх { bottomup }
+export
+{
+ KEYFEATURE_DETECTED // есть союзный паттерн или перечисление через запятую
+ KEYFEATURE_REQUIRED // =0 присоединено хотя бы одно существительное
+ KEYFEATURE_DESIRABLE // есть союз
+ РОД ПАДЕЖ ЧИСЛО ОДУШ
+ node:root_node
 }
 
 pattern ГруппаСущВосх
 {
- n1=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- comma=','
- n2=ЛогичЭлементСущ{ =n1:Падеж }:export { +KEYFEATURE_REQUIRED }
+ ГоловаГруппыСущ:export{ KEYFEATURE_DETECTED:0 KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+}
+
+pattern ГруппаСущВосх
+{
+ n1=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE:0 РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ comma=',' : export { KEYFEATURE_DETECTED:1 }
+ n2=ХвостГруппыСущ{ =n1:Падеж }:export { +KEYFEATURE_REQUIRED }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
 
@@ -81,11 +116,13 @@ pattern ГруппаСущВосх
 pattern ГруппаСущВосх
 {
  n1=ГруппаСущВосх:export { KEYFEATURE_REQUIRED РОД ПАДЕЖ ОДУШ ЧИСЛО node:root_node }
- conj=ЛогичСоюз
- n2=ЛогичЭлементСущ{ =n1:ПАДЕЖ }:export{ +KEYFEATURE_REQUIRED }
+ conj=ЛогичСоюз : export{ KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
+ n2=ХвостГруппыСущ{ =n1:ПАДЕЖ }:export{ +KEYFEATURE_REQUIRED }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
 : ngrams { 1 }
+
+
 
 
 wordentry_set НаречВперечисл=наречие:{
@@ -102,9 +139,9 @@ wordentry_set НаречВперечисл=наречие:{
 pattern ГруппаСущВосх
 {
  noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- conj=ЛогичСоюз
+ conj=ЛогичСоюз : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
  adv=НаречВперечисл
- n2=ЛогичЭлементСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
+ n2=ХвостГруппыСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
 } : links
 {
  noun.<RIGHT_LOGIC_ITEM>conj.
@@ -125,8 +162,8 @@ pattern ГруппаСущВосх
 {
  noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
  comma1=','
- conj1=ЛогичСоюз
- n2=ЛогичЭлементСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
+ conj1=ЛогичСоюз : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
+ n2=ХвостГруппыСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
 } : links
 {
  noun.<RIGHT_LOGIC_ITEM>comma1.
@@ -140,9 +177,10 @@ pattern ГруппаСущВосх
 //                ^^^^^^^^^^^^^^^^^^^^^^
 pattern ГруппаСущВосх
 {
- noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
- etc=ЗамыкательПеречисления
+ noun=ГруппаСущВосх:export{ /*KEYFEATURE_DETECTED*/ KEYFEATURE_REQUIRED /*KEYFEATURE_DESIRABLE*/ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ etc=ЗамыкательПеречисления : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
 } : links { noun.<RIGHT_LOGIC_ITEM>etc }
+
 
 
 
@@ -152,9 +190,9 @@ pattern ГруппаСущВосх
 {
  noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
  comma=','
- conj2=союз:а{}
+ conj2=союз:а{} : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
  adv=наречие:также{}
- n2=ЛогичЭлементСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
+ n2=ХвостГруппыСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
 } : links
 {
  noun.{
@@ -174,9 +212,9 @@ pattern ГруппаСущВосх
 {
  noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
  comma=','
- conj=союз:а{}
+ conj=союз:а{} : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
  p=частица:не{}
- n2=ЛогичЭлементСущ{ =Noun:Падеж }:export { +KEYFEATURE_REQUIRED }
+ n2=ХвостГруппыСущ{ =Noun:Падеж }:export { +KEYFEATURE_REQUIRED }
 } : links
 {
  noun.
@@ -192,9 +230,9 @@ pattern ГруппаСущВосх
 {
  noun=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
  comma=','
- conj=союз:но{}
+ conj=союз:но{} : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
  n=частица:не{}
- n2=ЛогичЭлементСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
+ n2=ХвостГруппыСущ{ =Noun:Падеж } : export { +KEYFEATURE_REQUIRED }
 } : links
 {
  noun.<RIGHT_LOGIC_ITEM>comma.
@@ -204,15 +242,75 @@ pattern ГруппаСущВосх
 }
 
 
+// Занимаюсь ремонтом сотовых телефонов, ЛЮБЫХ.
+//                            ^^^^^^^^^^^^^^^^
+pattern ГруппаСущВосх
+{
+ n1=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ comma=',' : export { KEYFEATURE_DETECTED:1 }
+ adj=ГруппаПрил0{ [-1]=n1:РОД =n1:ПАДЕЖ =n1:ЧИСЛО [-1]=n1:ОДУШ }
+ @noshift(ПравыйОграничительОборота)
+}
+: links { n1.{ <ATTRIBUTE>adj <PUNCTUATION>comma } }
+: ngrams { -1 adj_noun_score( adj, n1 ) }
+
+
+// Будет интересная программа, организованная курортом Архыз!
+//                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pattern ГруппаСущВосх
+{
+ n1=ГруппаСущВосх:export{ KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ comma=',' : export { KEYFEATURE_DETECTED:1 }
+ adj=ПричОборот2{ [-1]=n1:РОД =n1:ПАДЕЖ =n1:ЧИСЛО [-1]=n1:ОДУШ }
+ @noshift(ПравыйОграничительОборота) 
+}
+: links { n1.{ <ATTRIBUTE>adj <PUNCTUATION>comma } }
+: ngrams { adj_noun_score( adj, n1 ) }
+
 // -----------------------------------------------------
 
 
-// к этому человеку
-//   ^^^^^^^^^^^^^^
+function bool НеМестоимение( tree w )
+{
+ if( eq( wordform_class(w), МЕСТОИМЕНИЕ ) )
+  then return false;
+  else return true;
+}
+
+// Одиночное существительное:
+//
+// Любые действия фиксируются.
+// ^^^^^^^^^^^^^^
 pattern ГруппаСущ4
 {
- n=ГруппаСущВосх{ KEYFEATURE_REQUIRED:0 }:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+ n=ГоловаГруппыСущ{ НеМестоимение(_) } : export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 } : ngrams { ВалентностьСущ(n) }
+
+
+// В группу входит минимум одно существительное и есть союзы:
+//
+// Коровы и овцы стояли неподвижно.
+// ^^^^^^^^^^^^^
+pattern ГруппаСущ4
+{
+ n=ГруппаСущВосх{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:1 ~НеЭлементСоюзнГруппы }:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+} : ngrams { ВалентностьСущ(n) }
+
+
+// Особо рассматриваем группу из нескольких существительных, связанных
+// без использования союза. Небольшой штраф дает преимущество союзным конструкциям.
+//
+// Кошки, собаки, коровы забеспокоились.
+// ^^^^^^^^^^^^^^^^^^^^^
+pattern ГруппаСущ4
+{
+ n=ГруппаСущВосх{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:0 ~НеЭлементСоюзнГруппы }:export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
+} : ngrams
+{
+ -1
+ ВалентностьСущ(n)
+}
+
 
 
 // от нее остался только маленький камень
@@ -223,7 +321,7 @@ pattern ГруппаСущ4
  n=ГруппаСущ4 : export{ РОД ПАДЕЖ ЧИСЛО ОДУШ node:root_node }
 }
 : links { n.<PREFIX_PARTICLE>p }
-//: ngrams { -1 }
+: ngrams { 1 }
 
 
 // К нам пришел заказчик с «проектом мечты»

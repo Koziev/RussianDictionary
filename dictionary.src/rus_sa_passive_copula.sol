@@ -2,7 +2,7 @@
 // прилагательного в роли именного сказуемого.
 //
 // CD->01.09.2013
-// LC->19.11.2014
+// LC->25.10.2015
 
 
 patterns ВспомСтрадГлагол export { ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
@@ -11,7 +11,7 @@ patterns ВспомСтрадГлагол export { ЛИЦО ЧИСЛО РОД В
 //   ^^^^^^
 pattern ВспомСтрадГлагол
 {
- Гл1{ СвязочныйГлагол /*НАКЛОНЕНИЕ:ИЗЪЯВ*/ } : export { ЛИЦО ЧИСЛО РОД время node:root_node }
+ СвязочныйГлагол : export { ЛИЦО ЧИСЛО РОД время node:root_node }
 }
 
 // ++++
@@ -511,6 +511,15 @@ tree_scorer ВалентностьСвязки language=Russian generic
 }
 
 
+// Большие отели
+tree_scorer ВалентностьСвязки language=Russian
+{
+ if context { прилагательное:больший{ падеж:им } }
+  then -10
+}
+
+
+
 tree_scorers ОбъектКомпаратива
 
 tree_scorer ОбъектКомпаратива language=Russian
@@ -687,6 +696,22 @@ pattern СтрадСказВосх export { THEMA_VALENCY AUX_VERB_REQUIRED KEYF
 : links { v.<INFINITIVE>inf }
 : ngrams { v_inf_score( v, inf ) }
 
+// Инфинитив может прикрепляться к немодальному сказуемому:
+// Они воспитаны погибать.
+pattern СтрадСказВосх export { THEMA_VALENCY AUX_VERB_REQUIRED KEYFEATURE_DETECTED KEYFEATURE_REQUIRED ЛИЦО ЧИСЛО РОД ПАДЕЖВАЛ ПЕРЕХОДНОСТЬ (МОДАЛЬНЫЙ) node:root_node }
+{
+ v=СтрадСказВосх{ ~МОДАЛЬНЫЙ }  : export { THEMA_VALENCY AUX_VERB_REQUIRED KEYFEATURE_DETECTED KEYFEATURE_REQUIRED ЛИЦО ЧИСЛО РОД ПАДЕЖВАЛ ПЕРЕХОДНОСТЬ node:root_node }
+ inf=Инф2
+}
+: links { v.<INFINITIVE>inf }
+: ngrams
+{
+ -4
+ v_inf_score( v, inf )
+}
+
+
+
 // Прикрепляем вспомогательный глагол в личной форме
 // Ты вынужден будешь отказаться
 //             ^^^^^^
@@ -851,6 +876,21 @@ pattern СтрадСказНисх
  sbj=Подлежащее: export { ЛИЦО РОД ЧИСЛО }
  v=СтрадСказНисх{ THEMA_VALENCY:1 =sbj:РОД =sbj:ЧИСЛО =sbj:ЛИЦО } : export { THEMA_VALENCY:0 AUX_VERB_REQUIRED KEYFEATURE_DETECTED KEYFEATURE_REQUIRED ПАДЕЖВАЛ ПЕРЕХОДНОСТЬ МОДАЛЬНЫЙ node:root_node }
 } : links { v.<SUBJECT>sbj }
+
+
+// Никакой серьезной техники обнаружено не было.
+//                                      ^^^^^^^
+// Вообще, надо выставлять и пробрасывать по цепочке специальный флаг "отрицание" для НЕ БЫЛО.
+// Но пока попробуем обойтись без больших переделок.
+pattern СтрадСказНисх
+{
+ sbj=ГлДополнение{ ПАДЕЖ:РОД } : export { ЛИЦО РОД ЧИСЛО }
+ v=СтрадСказНисх{ THEMA_VALENCY:1 РОД:СР ЧИСЛО:ЕД } : export { THEMA_VALENCY:0 AUX_VERB_REQUIRED KEYFEATURE_DETECTED KEYFEATURE_REQUIRED ПАДЕЖВАЛ ПЕРЕХОДНОСТЬ МОДАЛЬНЫЙ node:root_node }
+} : links { v.<SUBJECT>sbj }
+: ngrams { -1 }
+
+
+
 
 
 // прикрепляем дополнение:

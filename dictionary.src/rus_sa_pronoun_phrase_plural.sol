@@ -8,7 +8,13 @@
 // папа и я пляшем
 // папа, мама, брат и я любим петь
 
-patterns ГруппаМестВосх0 export { KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
+patterns ГруппаМестВосх0
+export
+{
+ KEYFEATURE_REQUIRED
+ ПАДЕЖ ЛИЦО
+ node:root_node
+}
 
 pattern ГруппаМестВосх0
 {
@@ -33,18 +39,25 @@ pattern ГруппаМестВосх0 export { KEYFEATURE_REQUIRED ПАДЕЖ (�
 
 // ------------------------------------------
 
-patterns ГруппаМестВосх { bottomup } export { KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
+patterns ГруппаМестВосх { bottomup }
+export
+{
+ KEYFEATURE_DETECTED // если обнаружен второй или далее элемент перечисления, то будет=1
+ KEYFEATURE_REQUIRED
+ ПАДЕЖ ЛИЦО
+ node:root_node
+}
 
 pattern ГруппаМестВосх
 {
- ГруппаМестВосх0:export{ KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
+ ГруппаМестВосх0:export{ KEYFEATURE_DETECTED:0 KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
 }
 
 pattern ГруппаМестВосх
 {
  n1=ГруппаМестВосх:export{ KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
  comma=','
- n2=ГруппаМестВосх0{ =n1:Падеж }
+ n2=ГруппаМестВосх0{ =n1:Падеж } : export { KEYFEATURE_DETECTED:1 }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
 
@@ -52,7 +65,7 @@ pattern ГруппаМестВосх
 {
  n1=ГруппаМестВосх:export{ ПАДЕЖ node:root_node }
  comma=','
- n2=ГруппаМестВосх0{ =n1:Падеж }:export{ KEYFEATURE_REQUIRED ЛИЦО }
+ n2=ГруппаМестВосх0{ =n1:Падеж }:export{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED ЛИЦО }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>n2 }
 
@@ -65,7 +78,7 @@ pattern ГруппаМестВосх
 {
  n1=ГруппаМестВосх:export { KEYFEATURE_REQUIRED ПАДЕЖ ЛИЦО node:root_node }
  conj=ЛогичСоюз
- n2=ГруппаМестВосх0{ =n1:ПАДЕЖ }
+ n2=ГруппаМестВосх0{ =n1:ПАДЕЖ } : export { KEYFEATURE_DETECTED:1 }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
 : ngrams { 1 }
@@ -78,7 +91,7 @@ pattern ГруппаМестВосх
 {
  n1=ГруппаМестВосх:export { ПАДЕЖ node:root_node }
  conj=ЛогичСоюз
- n2=ГруппаМестВосх0{ =n1:ПАДЕЖ }:export { KEYFEATURE_REQUIRED ЛИЦО }
+ n2=ГруппаМестВосх0{ =n1:ПАДЕЖ }:export { KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED ЛИЦО }
 }
 : links { n1.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2 }
 : ngrams { 1 }
@@ -88,5 +101,5 @@ pattern ГруппаМестВосх
 
 pattern ГруппаМест export { ПАДЕЖ ЧИСЛО (РОД) ЛИЦО node:root_node }
 {
- n=ГруппаМестВосх{ KEYFEATURE_REQUIRED:0 }:export{ ПАДЕЖ ЧИСЛО:МН ЛИЦО node:root_node }
+ n=ГруппаМестВосх{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 }:export{ ПАДЕЖ ЧИСЛО:МН ЛИЦО node:root_node }
 }

@@ -1,4 +1,4 @@
-﻿wordentry_set ЛогичСоюз2 = 
+﻿wordentry_set ЛогичСоюз2_Элем = 
 {
  союз:хоть{},
  союз:то{},
@@ -8,9 +8,29 @@
  союз:ни{}
 }
 
+patterns ЛогичСоюз2 export { node:root_node }
+pattern ЛогичСоюз2
+{
+ ЛогичСоюз2_Элем : export { node:root_node }
+}
 
+
+// приехать не то из Омска, не то из Барнаула
+//          ^^^^^           ^^^^^
+pattern ЛогичСоюз2
+{
+ n=частица:не{}
+ c=союз:то{} : export { node:root_node }
+}
+: links { c.<NEGATION_PARTICLE>n }
+: ngrams { 2 }
+
+// ---------------------------------
 
 patterns СочинительныйСоюз1 export { node:root_node }
+
+
+
 
 
 pattern СочинительныйСоюз1
@@ -59,6 +79,7 @@ pattern СочинительныйСоюз2
 {
  СоюзноеСловосочет2 : export { node:root_node }
 }
+
 
 
 wordentry_set НаречиеСледования2=наречие:{ затем, потом, наконец, напоследок, после }

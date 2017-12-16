@@ -1,5 +1,14 @@
+"rus_sa_phrase_normalization.sol"
+
+"la-russian-misspelling.sol"
+
+"rus_sa_v_obj.sol"
+
+"la-russian-recognition-rules.sol"
+"rus_sa_adj_obj_score.sol"
 "rus_sa_adv_v_score.sol"
 "rus_sa_adv_verb_score2.sol"
+"rus_adv_prepos_score.sol"
 
 "rus_sa_postfix_score.sol"
 "rus_sa_ngram3.sol"
@@ -8,18 +17,17 @@
 "rus_sa_adv_adj_score.sol"
 "rus_sa_adj_noun_score.sol"
 "rus_sa_n_n_score.sol"
-"rus_sa_v_obj.sol"
 "rus_sa_prep_score.sol"
 "rus_sa_sbj_v_score.sol"
 "rus_sa_v_inf_score.sol"
 "rus_sa_n_name.sol"
 "rus_sa_adv_adv.sol"
 
-"rus_sa_adj_noun_score_autocollector.sol"
-"rus_sa_adv_verb_score_autocollector.sol"
+;"rus_sa_adj_noun_score_autocollector*.sol"
+;"rus_sa_sbj_verb_score_autocollector*.sol"
+;"rus_sa_adv_verb_score_autocollector*.sol"
 
 "rus_sa_associations.sol"
-"la-russian-recognition-rules.sol"
 
 "rus_sa_common_sets.sol"
 
@@ -31,7 +39,6 @@
 
 "rus_syllab_rules.sol"
 
-"la-russian-misspelling.sol"
 
 
 "rus_sg_slb.sol"
@@ -74,12 +81,14 @@
 "rus_sa_pronoun_phrase_plural.sol"
 "rus_sa_noun_phrase.sol"
 "rus_sa_noun_phrase_plural.sol"
+"rus_sa_predicate_conjunction.sol"
 "rus_sa_impers_verb.sol"
 "rus_sa_impers_modal_verb.sol"
 "rus_sa_negation_copula.sol"
 "rus_sa_count_copula.sol"
 "rus_sa_null_copula.sol"
 "rus_sa_null_copula2.sol"
+"rus_sa_induced_modality_copula.sol"
 "rus_sa_CopulaValency.sol"
 "rus_sa_subordinate_clause.sol"
 "rus_sa_comparative_rhema.sol"

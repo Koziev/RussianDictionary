@@ -8,7 +8,7 @@ patterns СравнРема export { node:root_node }
 //                  ^^^^^^^^^^^^^
 pattern СравнРема
 {
- ГруппаСравнПрил{ ~ИсклСравнПрил } : export { node:root_node }
+ ГруппаСравнПрил{ /*~ИсклСравнПрил*/ } : export { node:root_node }
 }
 
 
@@ -29,7 +29,7 @@ pattern ОбъектДляСравнПрил
 //                  ^^^^^^^^^^^^^
 pattern СравнРема
 {
- a=ГруппаСравнПрил{ ~ИсклСравнПрил } : export { node:root_node }
+ a=ГруппаСравнПрил{ /*~ИсклСравнПрил*/ } : export { node:root_node }
  obj=ОбъектДляСравнПрил
 }
 : links { a.<OBJECT>obj }
@@ -40,7 +40,7 @@ pattern СравнРема
 pattern СравнРема
 {
  obj=ОбъектДляСравнПрил
- a=ГруппаСравнПрил{ ~ИсклСравнПрил } : export { node:root_node }
+ a=ГруппаСравнПрил{ /*~ИсклСравнПрил*/ } : export { node:root_node }
 }
 : links { a.<OBJECT>obj }
 : ngrams { -1 }

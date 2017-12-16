@@ -62,7 +62,7 @@ pattern УказМест
 {
  n=УказМест0 : export { ПАДЕЖ РОД ОДУШ node:root_node }
  t='-'
- p='ка'
+ p=частица:ка{}
 }
 : links { n.<POSTFIX_PARTICLE>t.<NEXT_COLLOCATION_ITEM>p }
 : ngrams { 1 }
@@ -74,7 +74,7 @@ pattern УказМест
 {
  n=УказМест0 : export { ПАДЕЖ РОД ОДУШ node:root_node }
  t='-'
- p='то'
+ p=частица:то{}
 }
 : links { n.<POSTFIX_PARTICLE>t.<NEXT_COLLOCATION_ITEM>p }
 : ngrams { 1 }
@@ -93,7 +93,7 @@ pattern УказМест
 pattern УказМест
 {
  n=УказМест0 : export { ПАДЕЖ РОД ОДУШ node:root_node }
- p=ЧастицаБы{}
+ p=ЧастицаБы
 } : links { n.<POSTFIX_PARTICLE>p }
 
 
@@ -118,7 +118,7 @@ pattern УказМест
 pattern УказМест
 {
  n=УказМест0 : export { ПАДЕЖ РОД ОДУШ node:root_node }
- p=ЧастицаЖе{}
+ p=ЧастицаЖе
 } : links { n.<POSTFIX_PARTICLE>p }
 
 
@@ -293,7 +293,7 @@ pattern ГруппаМестоимСущ
 
 // вы все его знали
 //        ^^^
-wordentry_set НеПравАтрСР=прилагательное:{ этот, тот }
+wordentry_set НеПравАтрСР=прилагательное:{ этот, тот, весь }
 
 tree_scorers ВалентностьМестоим
 
@@ -337,6 +337,15 @@ pattern ГруппаМестоимСущ
 : links { n.<ATTRIBUTE>a }
 : ngrams { ВалентностьМестоим(n) }
 
+// Для суда нам требуется нечто большее.
+//                        ^^^^^^^^^^^^^
+pattern ГруппаМестоимСущ 
+{
+ n=УказМест : export { РОД ПАДЕЖ ОДУШ node:root_node }
+ a=ГруппаСравнПрил
+}
+: links { n.<ATTRIBUTE>a }
+: ngrams { -2 ВалентностьМестоим(n) }
 
 
 wordentry_set МодифДляНичего=наречие:{ уже, абсолютно, совсем, практически, буквально }

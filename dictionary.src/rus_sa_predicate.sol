@@ -7,6 +7,12 @@
 // НАСТОЯЩЕЕ ВРЕМЯ
 // -------------------
 
+pattern Сказуемое0
+{
+ ГлНаст:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
+}
+
+/*
 // кот спит
 pattern Сказуемое0
 {
@@ -20,7 +26,7 @@ pattern Сказуемое0
  p=ДеепрИнфОборотПеред
  v=ГлНаст:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
 } : links { v.<ADV_PARTICIPLE>p }
-
+*/
 
 // Компаратив как часть сказуемого в настоящем времени:
 // день становится короче
@@ -132,7 +138,8 @@ pattern Сказуемое0 export { ЛИЦО ЧИСЛО (РОД) ВРЕМЯ nod
 }
 
 
-// Компаратив как часть глагольного сказуемого в аналитическом будущем времени
+// Компаратив как часть глагольного сказуемого в аналитическом будущем времени:
+//
 // день будет становиться короче
 pattern Сказуемое0 export { ЛИЦО ЧИСЛО (РОД) ВРЕМЯ node:root_node }
 {
@@ -243,90 +250,19 @@ pattern Сказуемое0
 // ++++++++++++++++++++++++++
 
 
+pattern Сказуемое
+{
+ Сказуемое0 : export { node:root_node РОД ЛИЦО ЧИСЛО ВРЕМЯ }
+}
 
+
+/*
 patterns СказуемоеВосх { bottomup  } export { node:root_node РОД ЛИЦО ЧИСЛО ВРЕМЯ }
 
 pattern СказуемоеВосх
 {
  Сказуемое0 : export { node:root_node РОД ЛИЦО ЧИСЛО ВРЕМЯ }
 } //: ngrams { -2 }
-
-
-// Здесь человек либо сходил с ума, либо переставал чему-либо удивляться.
-pattern СказуемоеВосх
-{
- conj1=ЛогичСоюз2
- v=Сказуемое0:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
- comma=','
- conj2=ЛогичСоюз2
- v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
-} : links
-{
- v.{
-    <PREFIX_CONJUNCTION>conj1
-    <RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>conj2.<NEXT_COLLOCATION_ITEM>v2
-   }
-}
-//: ngrams { 2 }
-
-
-// вы едите пюре или суп, потом пьете чай
-//                      ^^^^^^^^^^^^^^^^^
-pattern СказуемоеВосх
-{
- v=СказуемоеВосх:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
- comma=','
- v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
-}
-: links { v.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>v2 }
-//: ngrams { 2 }
-
-
-// Человек взял да убежал
-//         ^^^^^^^^^^^^^^
-pattern СказуемоеВосх
-{
- v=СказуемоеВосх:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
- conj=ЛогичСоюз
- v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
-}
-: links { v.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>v2 }
-//: ngrams { 2 }
-
-
-
-// Он поднимался вверх на несколько дюймов, прочно упирался ногами в стену, а затем распрямлял колени.
-pattern СказуемоеВосх
-{
- v=СказуемоеВосх:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
- comma=','
- conj=ПротивитСоюз
- v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
-} : links
-{
- v.<RIGHT_LOGIC_ITEM>comma.
-    <NEXT_COLLOCATION_ITEM>conj.
-     <NEXT_COLLOCATION_ITEM>v2
-}
-//: ngrams { 2 }
-
-
-// я не только прошу , но и умоляю
-pattern СказуемоеВосх
-{
- v=СказуемоеВосх:export{ ЛИЦО ЧИСЛО РОД ВРЕМЯ node:root_node }
- comma=','
- conj1=союз:но{}
- conj2=союз:и{}
- v2=Сказуемое0{=V:ЛИЦО =V:ЧИСЛО =V:РОД}
-} : links
-{
- v.<RIGHT_LOGIC_ITEM>comma.
-    <NEXT_COLLOCATION_ITEM>conj1.
-     <NEXT_COLLOCATION_ITEM>conj2.
-      <NEXT_COLLOCATION_ITEM>v2
-}
-//: ngrams { 2 }
 
 
 // вы едите пюре или суп, потом пьете чай, и наконец пойдете спать
@@ -402,10 +338,17 @@ pattern Сказуемое
 {
  СказуемоеВосх : export { node:root_node РОД ЛИЦО ЧИСЛО ВРЕМЯ }
 }
+*/
+
+
+
+
+
 
 // ++++++++++++++++++++++++++
 
 
+// ???
 // Сказуемое со словом СЛОВНО
 // Цветущий луг словно ковёр
 pattern Сказуемое export { (ЛИЦО) (ЧИСЛО) (РОД) (ВРЕМЯ) node:root_node }
@@ -450,111 +393,8 @@ pattern ГлПредикат
 }
 
 
-/*
-// нам эта группа будет подчиняться
-pattern ГлПредикат
-{
- Obj=ГлДополнение{ПАДЕЖ:ДАТ}
- N=Подлежащее
- aux=ГлБытьБудущ : export { node:root_node }
- p=@optional(частица:ли{})
- adv1=@optional(ГруппаНареч2)
- inf=ИНФИНИТИВ:*{ ВИД:НЕСОВЕРШ ПЕРЕХОДНОСТЬ:ПЕРЕХОДНЫЙ ПАДЕЖ:ДАТ }
-} : links
-{
- aux.{
-      <SUBJECT>n
-      ~<POSTFIX_PARTICLE>p
-      <INFINITIVE>inf.{
-                       ~<ATTRIBUTE>adv1
-                       <OBJECT>obj
-                      }
-     }
-}
-: ngrams
-{
- v_obj_score( inf, obj )
- adv_verb_score( adv1, inf )
- ВалентностьГлагола(aux)
- ВалентностьГлагола(inf)
- ВалентностьПредиката(aux)
-}
-*/
-
 // +++++++++++++++++++++++++
 
 
 
-
-patterns ГлПредикатНисх export { node:root_node РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ }
-
-
-pattern ГлПредикатНисх
-{
- Сказуемое : export { node:root_node РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ:ИМ }
-} : ngrams { -10 }
-
-// Дверь скрипит и трещит
-pattern ГлПредикатНисх export { node:root_node РОД ЛИЦО ЧИСЛО (ПАДЕЖВАЛ) }
-{
- N=Подлежащее
- V=ГлПредикатНисх{ ПАДЕЖВАЛ:ИМ =N:РОД =N:ЛИЦО =N:ЧИСЛО } : export { РОД ЛИЦО ЧИСЛО node:root_node }
-}
-: links { v.<SUBJECT>n }
-: ngrams
-{
- 10
- sbj_v_score( n, v )
-}
-
-
-// мгновение спустя дверь снова скрипнула и закрылась.
-pattern ГлПредикатНисх
-{
- adv=Обст
- V=ГлПредикатНисх : export { РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ node:root_node }
-}
-: links { v.<ATTRIBUTE>adv }
-: ngrams { adv_verb_score( adv, v ) }
-
-
-// За углом кто-то закричал и затопал ногами
-pattern ГлПредикатНисх
-{
- pn=ПредлогИСущ
- V=ГлПредикатНисх{ гл_предл(_,pn.prepos,pn.n2) } : export { РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ node:root_node }
-}
-: links { v.<PREPOS_ADJUNCT>pn }
-: ngrams
-{
- prepos_score( v, pn.prepos )
- ngram3( v, pn.prepos, pn.n2 )
-}
-
-// вернее сказать, мы пропустили нужный поворот, заблудились в лесу и можем погибнуть
-pattern ГлПредикатНисх
-{
- intro=ВводнАктант
- V=ГлПредикатНисх : export { РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ node:root_node }
-}
-: links { v.<BEG_INTRO>intro }
-
-
-// Уставшие и голодные, они уселись за стол и начали есть
-pattern ГлПредикатНисх
-{
- attr=ОбособленныйАтрибут
- V=ГлПредикатНисх : export { РОД ЛИЦО ЧИСЛО ПАДЕЖВАЛ node:root_node }
-} : links { v.<SEPARATE_ATTR>attr }
-
-
-
-// -------------
-
-pattern ГлПредикат
-{
- v=ГлПредикатНисх{ ~ПАДЕЖВАЛ:ИМ } : export { node:root_node }
-} : ngrams { ВалентностьПредиката(v) }
-
-// --------------
 

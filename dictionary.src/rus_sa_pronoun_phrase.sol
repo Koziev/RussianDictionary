@@ -119,11 +119,19 @@ pattern КванторДляМестоимЕд
 } : links { a.<PREFIX_PARTICLE>p }
 
 
-wordentry_set КванторДляМестоимМн0=прилагательное:{ весь, сам, оба }
+wordentry_set КванторДляМестоимМн0_1=прилагательное:{ весь, оба }
+wordentry_set КванторДляМестоимМн0_2=прилагательное:{ сам }
 
 pattern КванторДляМестоимМнож
 {
- ГруппаПрил1{ КванторДляМестоимМн0 ЧИСЛО:МН } : export { node:root_node РОД ПАДЕЖ ЧИСЛО ОДУШ }
+ ГруппаПрил1{ КванторДляМестоимМн0_1 ЧИСЛО:МН } : export { node:root_node РОД ПАДЕЖ ЧИСЛО ОДУШ }
+} : ngrams { -1 }
+
+// Ну, вы сами понимаете ...
+//     ^^^^^^^
+pattern КванторДляМестоимМнож
+{
+ ГруппаПрил1{ КванторДляМестоимМн0_2 ЧИСЛО:МН } : export { node:root_node РОД ПАДЕЖ ЧИСЛО ОДУШ }
 }
 
 pattern КванторДляМестоимМнож
@@ -199,7 +207,6 @@ pattern МестоимСПравПрил
  p=МестоимСПостфиксом{ число:мн ~ПАДЕЖ:ВИН } : export{ ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
  adj=КванторДляМестоимМнож{ =P:ПАДЕЖ ~род:ср }
 } : links { p.<ATTRIBUTE>adj }
-  : ngrams { -1 }
 
 // Все вы сдохните!
 // ^^^^^^
@@ -208,7 +215,6 @@ pattern МестоимСПравПрил
  adj=КванторДляМестоимМнож{ ~ПАДЕЖ:ВИН ~род:ср }
  p=МестоимСПостфиксом{ число:мн =adj:ПАДЕЖ } : export{ ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
 } : links { p.<ATTRIBUTE>adj }
-  : ngrams { -1 }
 
 
 // обе они оказались из серебра.
@@ -368,7 +374,6 @@ pattern МестоимСПравПрил
 //
 // И не вам бы говорить это!
 //   ^^^^^^^^^
-patterns МестоимСПрефиксом export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
 
 
 pattern МестоимСПрефиксом
@@ -424,6 +429,28 @@ pattern МестоимСПрефиксом
 
 
 
+// Она любит одного тебя...
+//           ^^^^^^^^^^^
+pattern МестоимСПравПрил
+{
+ p=числительное:один{}
+ n=МестоимСПостфиксом{ =p:число =p:падеж } : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+}
+: links { n.<ATTRIBUTE>p }
+
+
+// Я хочу всю тебя.
+//        ^^^^^^^^
+pattern МестоимСПравПрил
+{
+ p=прилагательное:весь{}
+ n=МестоимСПостфиксом{ =p:число =p:падеж } : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+}
+: links { n.<ATTRIBUTE>p }
+
+
+
+
 // -----------------------------------------------------
 
 patterns МестоимЯдро export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
@@ -462,51 +489,55 @@ pattern МестоимЯдро
  p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
 }
 : links { p.<ATTRIBUTE>mod }
-//: ngrams { -1 }
+
+
 
 // -------------------------------------------------
 
-pattern ГруппаМест
+patterns ГруппаМестВосх1 { bottomup } export { KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+
+
+pattern ГруппаМестВосх1
 {
- p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+ p=МестоимЯдро : export { KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:0 ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
 }
 
 
-// тебя и нас
-pattern ГруппаМест
+// И противник, и мы устаем.
+//   ^^^^^^^^^
+pattern ГруппаМестВосх1
 {
- p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
- conj=союз:и{}
- p2=МестоимЯдро{ =P:ПАДЕЖ }
+ p=СущСПредложДоп : export { KEYFEATURE_REQUIRED:1 KEYFEATURE_DESIRABLE:0 ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+}
+
+
+
+// тебя и нас пригласили
+// ^^^^^^^^^^
+pattern ГруппаМестВосх1
+{
+ p=ГруппаМестВосх1 : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+ conj=ЛогичСоюз : export { KEYFEATURE_DESIRABLE:1 }
+ p2=МестоимЯдро{ =P:ПАДЕЖ } : export { KEYFEATURE_REQUIRED:0 }
 } : links { p.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>p2 }
 
 
 // Ты, и только ты способен на это.
 // ^^^^^^^^^^^^^^^
-pattern ГруппаМест
+pattern ГруппаМестВосх1
 {
- p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+ p=ГруппаМестВосх1 : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
  comma=','
- conj=союз:и{}
- p2=МестоимЯдро{ =P:ПАДЕЖ }
+ conj=ЛогичСоюз : export { KEYFEATURE_DESIRABLE:1 }
+ p2=МестоимЯдро{ =P:ПАДЕЖ } : export { KEYFEATURE_REQUIRED:0 }
 } : links { p.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>conj.<NEXT_COLLOCATION_ITEM>p2 }
-
-
-
-// тебя с ней
-pattern ГруппаМест
-{
- p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
- conj=предлог:с{}
- p2=МестоимЯдро{ ПАДЕЖ:ТВОР }
-} : links { p.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>p2 }
 
 
 // я тебя, дурака, пальцем тронула?
 //   ^^^^^^^^^^^^^
-pattern ГруппаМест
+pattern ГруппаМестВосх1
 {
- p=МестоимЯдро : export{ ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+ p=ГруппаМестВосх1 : export{ KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
  comma1=','
  det=ГруппаСущ4{ =p:ЧИСЛО =p:ПАДЕЖ }
  @noshift(ПравыйОграничительОборота)
@@ -524,25 +555,44 @@ pattern ГруппаМест
 
 
 // Я и Саша пойдём в кино.
-pattern ГруппаМест
+// ^^^^^^^^
+pattern ГруппаМестВосх1
 {
- p=МестоимЯдро : export{ ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
- conj=союз:и{}
+ p=ГруппаМестВосх1 : export{ KEYFEATURE_REQUIRED ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
+ conj=ЛогичСоюз : export { KEYFEATURE_DESIRABLE:1 }
  n2=ГлДополнение{ =p:ПАДЕЖ }
 } : links
 {
  p.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>n2
 }
 
+// -------------------------------------------------
+
+patterns ГруппаМестНисх1
+export
+{
+ KEYFEATURE_DETECTED // если обнаружено перечисление или союзный паттерн
+ KEYFEATURE_REQUIRED
+ KEYFEATURE_DESIRABLE
+ ПАДЕЖ ЧИСЛО РОД ЛИЦО
+ node:root_node
+}
+
+
+pattern ГруппаМестНисх1
+{
+ p=ГруппаМестВосх1 : export { KEYFEATURE_DETECTED:0 KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+}
+
 
 // неуемная натура его осложняет  жизнь  и ему, и мне.
 //                                       ^^^^^^^^^^^^
-pattern ГруппаМест
+pattern ГруппаМестНисх1
 {
  conj1=СочинительныйСоюз1
- p=МестоимЯдро : export{ ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
+ p=ГруппаМестНисх1 : export{ KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
  comma=','
- conj2=СочинительныйСоюз2
+ conj2=СочинительныйСоюз2 : export { KEYFEATURE_DETECTED:1 }
  n2=ГлДополнение{ =p:ПАДЕЖ }
 } : links
 {
@@ -554,12 +604,14 @@ pattern ГруппаМест
    }
 }
 
-pattern ГруппаМест
+
+// И мы, и противник устаем
+pattern ГруппаМестНисх1
 {
  conj1=ЛогичСоюз
- p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
+ p=ГруппаМестНисх1 : export { KEYFEATURE_REQUIRED:0 ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
  comma=','
- conj2=ЛогичСоюз
+ conj2=ЛогичСоюз : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
  n2=ГлДополнение{ =p:ПАДЕЖ }
 } : links
 {
@@ -572,24 +624,89 @@ pattern ГруппаМест
 }
 
 
-// Немного упрощенный подход к сборке такой конструкции,
-// но это не должно мешать ничему:
-// - Ты  что,  смеешься?
-//   ^^^^^^^
-// Тебе что, плохо живется?
-// ^^^^^^^^^
+
+
+// - А почему пехота и мы идем куда-то?
+//            ^^^^^^^^^^^
+pattern ГруппаМестНисх1
+{
+ n2=СущСПредложДоп : export{ ПАДЕЖ ЧИСЛО:МН node:root_node }
+ conj=ЛогичСоюз : export { KEYFEATURE_DETECTED:1 KEYFEATURE_DESIRABLE:1 }
+ p=ГруппаМестНисх1{ =n2:ПАДЕЖ } : export{ РОД ЛИЦО KEYFEATURE_REQUIRED }
+} : links
+{
+ n2.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>p
+}
+
+// Пехота, мы и кавалерия пойдем в обход
+// ^^^^^^^^^^^^^^^^^^^^^^
+pattern ГруппаМестНисх1
+{
+ n2=СущСПредложДоп : export{ ПАДЕЖ ЧИСЛО:МН node:root_node }
+ comma=',' : export { KEYFEATURE_DETECTED:1 }
+ p=ГруппаМестНисх1{ =n2:ПАДЕЖ } : export { РОД ЛИЦО KEYFEATURE_REQUIRED KEYFEATURE_DESIRABLE }
+} : links
+{
+ n2.<RIGHT_LOGIC_ITEM>comma.<NEXT_COLLOCATION_ITEM>p
+}
+
+
+// -------------------------------------------------
+
+// Одиночное местоимение, без союзного паттерна:
+// Толя, мы идем в кино.
+//       ^^
 pattern ГруппаМест
 {
- n=МестоимЯдро : export { ПАДЕЖ ЧИСЛО:МН РОД ЛИЦО node:root_node }
- p=местоим_сущ:что{ падеж:им }
- p2=@optional(частица:же{})
- comma=','
+ МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
 }
-: links { n.<POSTFIX_PARTICLE>p.{
-                                 ~<POSTFIX_PARTICLE>p2
-                                 <PUNCTUATION>comma
-                                }
-        }
-: ngrams { 1 }
 
 
+// Союзная смесь из местоимений и существительных:
+// Я и Коля идем в кино.
+// ^^^^^^^^
+pattern ГруппаМест
+{
+ ГруппаМестНисх1{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:1 } : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+}
+
+
+wordentry_set НеГоловаМестГруппы=
+{
+ местоим_сущ:что{} // Ты что, меня забыла?
+}
+
+
+// В случае, если в конструкцию не вошел союз, то налагаем небольшой штраф:
+//
+// Толя, мы уходим.
+// ~~~~~~~~
+pattern ГруппаМест
+{
+ ГруппаМестНисх1{ KEYFEATURE_DETECTED:1 KEYFEATURE_REQUIRED:0 KEYFEATURE_DESIRABLE:0 ~НеГоловаМестГруппы } : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+} : ngrams { -2 }
+
+
+
+// -------------------------------------------------
+
+
+// ????
+// тебя с ней
+pattern ГруппаМест
+{
+ p=МестоимЯдро : export { ПАДЕЖ ЧИСЛО РОД ЛИЦО node:root_node }
+ conj=предлог:с{}
+ p2=МестоимЯдро{ ПАДЕЖ:ТВОР }
+} : links { p.<RIGHT_LOGIC_ITEM>conj.<NEXT_COLLOCATION_ITEM>p2 }
+
+
+// -------------------------------------------------
+
+
+// При виде меня она вздрагивает
+//          ^^^^
+pattern РодОбъектСущ
+{
+ ГруппаМест{ ПАДЕЖ:РОД } : export { node:root_node }
+} : ngrams { -6 }
